@@ -1,1 +1,9 @@
-Error: Unable to access jarfile src/checker/checkstyle-8.36.2-all.jar
+Starting audit...
+[ERROR] D:\Programming\Java Stuff\POOTV\.\src\checker\CheckStyleConstants.java:3:1: Utility classes should not have a public or default constructor. [HideUtilityClassConstructor]
+[ERROR] D:\Programming\Java Stuff\POOTV\.\src\Main.java:1:1: Utility classes should not have a public or default constructor. [HideUtilityClassConstructor]
+[ERROR] D:\Programming\Java Stuff\POOTV\.\src\Main.java:2:5: Missing a Javadoc comment. [MissingJavadocMethod]
+[ERROR] D:\Programming\Java Stuff\POOTV\.\src\Main.java:2:29: Parameter args should be final. [FinalParameters]
+[ERROR] D:\Programming\Java Stuff\POOTV\.\src\Test.java:1: File does not end with a newline. [NewlineAtEndOfFile]
+[ERROR] D:\Programming\Java Stuff\POOTV\.\src\Test.java:9:28: Using the '.*' form of import should be avoided - java.util.concurrent.*. [AvoidStarImport]
+Audit done.
+Checkstyle ends with 6 errors.
