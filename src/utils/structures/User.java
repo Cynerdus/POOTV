@@ -1,4 +1,6 @@
-package utils;
+package utils.structures;
+
+import utils.structures.Credentials;
 
 public class User {
 

@@ -1,7 +1,7 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import utils.Input;
+import utils.structures.Input;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,13 +17,15 @@ public final class Main {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
 
-        Input inputData = objectMapper.readValue(new File(args[0]), Input.class);
+        Input inputData = objectMapper.readValue(new File("checker/resources/in/basic_6.json"), Input.class);
+        //Input inputData = objectMapper.readValue(new File(args[0]), Input.class);
         ArrayNode outputData = objectMapper.createArrayNode();
 
-        GameManager gameManager = new GameManager(inputData, outputData);
-        outputData = gameManager.generateOutput();
+        Simulator simulator = new Simulator(inputData, outputData);
+        outputData = simulator.generateOutput();
 
-        objectWriter.writeValue(new File(args[1]), outputData);
+        objectWriter.writeValue(new File("out.json"), outputData);
+        //objectWriter.writeValue(new File(args[1]), outputData);
     }
 
     private Main() { }
