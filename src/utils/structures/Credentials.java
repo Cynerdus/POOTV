@@ -7,6 +7,8 @@ public class Credentials {
     private String accountType;
     private String country;
     private int balance;
+    private int tokens;
+    private int numFreePremiumMovies = 15;
 
     public Credentials() { }
 
@@ -88,5 +90,44 @@ public class Credentials {
      */
     public void setBalance(final int balance) {
         this.balance = balance;
+    }
+
+    public void addBalance(final int balance) {
+        this.balance += balance;
+    }
+
+    public void subtractBalance(final int balance) {
+        this.balance -= balance;
+    }
+    public int getTokens() {
+        return tokens;
+    }
+
+    public void setTokens(final int tokens) {
+        this.tokens = tokens;
+    }
+
+    public void addTokens(final int tokens) {
+        this.tokens += tokens;
+    }
+
+    public void subtractTokens(final int tokens) {
+        this.tokens -= tokens;
+    }
+
+    public int getNumFreePremiumMovies() {
+        return numFreePremiumMovies;
+    }
+
+    public void setNumFreePremiumMovies(final int numFreePremiumMovies) {
+        this.numFreePremiumMovies = numFreePremiumMovies;
+    }
+
+    public void decrementNumFreePremiumMovies() {
+        this.numFreePremiumMovies--;
+    }
+
+    public void incrementNumFreePremiumMovies() {
+        this.numFreePremiumMovies++;
     }
 }

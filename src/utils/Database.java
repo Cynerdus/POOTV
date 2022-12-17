@@ -12,7 +12,8 @@ public class Database {
     private final List<User> users = new ArrayList<>();
     private final List<Movie> movies = new ArrayList<>();
 
-    private User loggedUser;
+    private User loggedUser = null;
+    private Movie currentMovieOnScreen = null;
 
     public Database() {
 
@@ -91,5 +92,13 @@ public class Database {
         }
 
         return null;
+    }
+
+    public Movie getCurrentMovieOnScreen() {
+        return currentMovieOnScreen;
+    }
+
+    public void setCurrentMovieOnScreen(Movie currentMovieOnScreen) {
+        this.currentMovieOnScreen = currentMovieOnScreen;
     }
 }

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 public class Contains {
 
-    private ArrayList<String> actors;
-    private ArrayList<String> genre;
+    private ArrayList<String> actors = new ArrayList<>();
+    private ArrayList<String> genre = new ArrayList<>();
 
     public Contains() { }
 

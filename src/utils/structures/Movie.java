@@ -10,6 +10,9 @@ public class Movie {
     private ArrayList<String> genres;
     private ArrayList<String> actors;
     private ArrayList<String> countriesBanned;
+    private int numLikes = 0;
+    private int rating = 0;
+    private int numRatings = 0;
 
     public Movie() { }
 
@@ -107,5 +110,37 @@ public class Movie {
      */
     public void setCountriesBanned(final ArrayList<String> countriesBanned) {
         this.countriesBanned = countriesBanned;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    public int getNumLikes() {
+        return numLikes;
+    }
+
+    public void setNumLikes(int numLikes) {
+        this.numLikes = numLikes;
+    }
+
+    public void incrementNumLikes() {
+        this.numLikes++;
+    }
+
+    public int getNumRatings() {
+        return numRatings;
+    }
+
+    public void setNumRatings(int numRatings) {
+        this.numRatings = numRatings;
+    }
+
+    public void incrementNumRatings() {
+        this.numRatings++;
     }
 }

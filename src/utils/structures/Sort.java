@@ -2,8 +2,8 @@ package utils.structures;
 
 public class Sort {
 
-    private String rating;
-    private String duration;
+    private String rating = " ";
+    private String duration = " ";
 
     public Sort() { }
 
