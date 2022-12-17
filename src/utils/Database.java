@@ -14,6 +14,7 @@ public class Database {
 
     private User loggedUser = null;
     private Movie currentMovieOnScreen = null;
+    private List<Movie> currentlyFilteredMovies = null;
 
     public Database() {
 
@@ -98,7 +99,26 @@ public class Database {
         return currentMovieOnScreen;
     }
 
-    public void setCurrentMovieOnScreen(Movie currentMovieOnScreen) {
+    public void setCurrentMovieOnScreen(final Movie currentMovieOnScreen) {
         this.currentMovieOnScreen = currentMovieOnScreen;
+    }
+
+    public List<Movie> getCurrentlyFilteredMovies() {
+        return currentlyFilteredMovies;
+    }
+
+    public void setCurrentlyFilteredMovies(final List<Movie> currentlyFilteredMovies) {
+        this.currentlyFilteredMovies = currentlyFilteredMovies;
+
+        for (Movie movie : currentlyFilteredMovies)
+            System.out.println("... " + movie.getName());
+    }
+
+    public Movie getElementFromFilteredMovies(final String name) {
+        for (Movie movie : currentlyFilteredMovies)
+            if (movie.getName().equals(name))
+                return movie;
+
+        return null;
     }
 }

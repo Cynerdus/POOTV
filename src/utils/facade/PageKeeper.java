@@ -10,6 +10,8 @@ import utils.constants.Strings;
 import utils.structures.Credentials;
 import utils.structures.Movie;
 
+import java.util.List;
+
 public class PageKeeper {
 
     private final Database database;
@@ -40,7 +42,6 @@ public class PageKeeper {
     }
 
     public void processPageAction(final Action action) {
-        System.out.println("Type curent: " + action.getType());
 
         String activePageName = getActivePageName();
         switch (activePageName) {
@@ -68,7 +69,6 @@ public class PageKeeper {
     }
 
     private void processActionOnUnauthenticatedPage(final Action action) {
-        System.out.println("unauth");
         if (unauthenticated.isPageSwitchLegal(action.getPage())) {
             switchActivityOnUnauthenticated();
 
@@ -84,7 +84,6 @@ public class PageKeeper {
     }
 
     private void processActionOnLoginPage(final Action action) {
-        System.out.println("login");
         if (login.isPageSwitchLegal(action.getPage())) {
             switchActivityOnLogin();
 
@@ -118,7 +117,6 @@ public class PageKeeper {
     }
 
     private void processActionOnRegisterPage(final Action action) {
-        System.out.println("register");
         if (register.isPageSwitchLegal(action.getPage())) {
             switchActivityOnRegister();
 
@@ -151,7 +149,6 @@ public class PageKeeper {
     }
 
     private void processActionOnAuthenticatedPage(final Action action) {
-        System.out.println("auth");
         if (authenticated.isPageSwitchLegal(action.getPage())) {
             switchActivityOnAuthenticated();
 
@@ -183,9 +180,15 @@ public class PageKeeper {
         }
 
         if (movies.isFeatureLegal(action.getFeature())) {
+            System.out.println("movie features: " + action.getFeature());
             switch (action.getFeature()) {
                 case FeatureNames.SEARCH    -> Printer.printMoviesBySearch(database, outputData, getLoggedUserCredentials(), action.getStartsWith());
-                case FeatureNames.FILTER    -> Printer.printMoviesByFilter(database, outputData, getLoggedUserCredentials(), action.getFilters());
+                case FeatureNames.FILTER
+                        -> {
+                    System.out.println("feature filter");
+                    List<Movie> list = Printer.printMoviesByFilter(database, outputData, getLoggedUserCredentials(), action.getFilters());
+                    database.setCurrentlyFilteredMovies(list);
+                }
                 default                     -> Printer.printDefaultError(outputData);
             }
 
@@ -196,7 +199,6 @@ public class PageKeeper {
     }
 
     private void processActionOnUpgradesPage(final Action action) {
-        System.out.println("upgrades");
 
         if (upgrades.isPageSwitchLegal(action.getPage())) {
             switchActivityOnUpgrades();
@@ -212,11 +214,16 @@ public class PageKeeper {
         }
 
         if (upgrades.isFeatureLegal(action.getFeature())) {
+            boolean rc;
+
             switch (action.getFeature()) {
-                case FeatureNames.BUY_TOKENS            -> upgrades.buyTokens(action.getCount(), database.getLoggedUser());
-                case FeatureNames.BUY_PREMIUM_ACCOUNT   -> upgrades.buyPremium(database.getLoggedUser());
-                default                                 -> Printer.printDefaultError(outputData);
+                case FeatureNames.BUY_TOKENS            -> rc = upgrades.buyTokens(action.getCount(), database.getLoggedUser());
+                case FeatureNames.BUY_PREMIUM_ACCOUNT   -> rc = upgrades.buyPremium(database.getLoggedUser());
+                default                                 -> rc = false;
             }
+
+            if (!rc)
+                Printer.printDefaultError(outputData);
 
             return;
         }
@@ -225,9 +232,7 @@ public class PageKeeper {
     }
 
     private void processActionOnSeeDetailsPage(final Action action) {
-        System.out.println("details " + action.getPage());
         if (seeDetails.isPageSwitchLegal(action.getPage())) {
-            System.out.println("legal page");
             switchActivityOnSeeDetails();
 
             switch (action.getPage()) {
@@ -241,12 +246,17 @@ public class PageKeeper {
             return;
         }
 
-        System.out.println("feature: " + action.getFeature());
         switch (action.getFeature()) {
             case FeatureNames.WATCH     -> activateWatchFeature(action);
             case FeatureNames.PURCHASE  -> activatePurchaseFeature(action);
             case FeatureNames.LIKE      -> activateLikeFeature(action);
             case FeatureNames.RATE      -> activateRateFeature(action);
+            case FeatureNames.FILTER
+                    -> {
+                System.out.println("feature filter");
+                List<Movie> list = Printer.printMoviesByFilter(database, outputData, getLoggedUserCredentials(), action.getFilters());
+                database.setCurrentlyFilteredMovies(list);
+            }
             default                     -> Printer.printDefaultError(outputData);
         }
     }
@@ -265,14 +275,13 @@ public class PageKeeper {
 
     private Movie getMovieFromDatabase(final String name) {
         for (Movie movie : database.getMovies()) {
-            if (movie.getName().matches(name))
+            if (movie.getName().equals(name))
                 return movie;
         }
         return null;
     }
 
     private void activateWatchFeature(final Action action) {
-        System.out.println("watch");
         Movie movie = (database.getCurrentMovieOnScreen() != null) ? database.getCurrentMovieOnScreen()
                 : (action.getMovie() != null) ? getMovieFromDatabase(action.getMovie()) : null;
 
@@ -284,7 +293,6 @@ public class PageKeeper {
     }
 
     private void activatePurchaseFeature(final Action action) {
-        System.out.println("purchase");
         Movie movie = (database.getCurrentMovieOnScreen() != null) ? database.getCurrentMovieOnScreen()
                 : (action.getMovie() != null) ? getMovieFromDatabase(action.getMovie()) : null;
 
@@ -299,7 +307,6 @@ public class PageKeeper {
     }
 
     private void activateLikeFeature(final Action action) {
-        System.out.println("like");
         Movie movie = (database.getCurrentMovieOnScreen() != null) ? database.getCurrentMovieOnScreen()
                 : (action.getMovie() != null) ? getMovieFromDatabase(action.getMovie()) : null;
 
@@ -312,7 +319,6 @@ public class PageKeeper {
     }
 
     private void activateRateFeature(final Action action) {
-        System.out.println("rate");
         Movie movie = (database.getCurrentMovieOnScreen() != null) ? database.getCurrentMovieOnScreen()
                 : (action.getMovie() != null) ? getMovieFromDatabase(action.getMovie()) : null;
 
@@ -352,7 +358,9 @@ public class PageKeeper {
     }
 
     private void switchActivityOnSeeDetails(final String movieName) {
-        Movie movie = getMovieFromDatabase(movieName);
+        Movie movie = (database.getCurrentlyFilteredMovies() != null)
+                    ? database.getElementFromFilteredMovies(movieName)
+                    : getMovieFromDatabase(movieName);
 
         seeDetails.activeSwitch();
         database.setCurrentMovieOnScreen(movie);

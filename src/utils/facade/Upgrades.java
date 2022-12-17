@@ -25,13 +25,23 @@ public class Upgrades extends Page{
         legalFeatures.add(FeatureNames.BUY_PREMIUM_ACCOUNT);
     }
 
-    public void buyTokens(final int tokens, final User user) {
-        user.getCredentials().subtractBalance(tokens);
-        user.getCredentials().addTokens(tokens);
+    public boolean buyTokens(final int tokens, final User user) {
+        if (user.getCredentials().getBalance() >= tokens) {
+            user.getCredentials().subtractBalance(tokens);
+            user.getCredentials().addTokens(tokens);
+            return true;
+        }
+
+        return false;
     }
 
-    public void buyPremium(final User user) {
-        user.getCredentials().subtractTokens(10);
-        user.getCredentials().setAccountType(Strings.PREMIUM);
+    public boolean buyPremium(final User user) {
+        if (user.getCredentials().getBalance() >= 10) {
+            user.getCredentials().subtractTokens(10);
+            user.getCredentials().setAccountType(Strings.PREMIUM);
+            return true;
+        }
+
+        return false;
     }
 }

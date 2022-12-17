@@ -74,7 +74,7 @@ public class Printer {
         output.add(node);
     }
 
-    public static void printMoviesByFilter(Database database, ArrayNode output, Credentials credentials, Filters filters) {
+    public static List<Movie> printMoviesByFilter(Database database, ArrayNode output, Credentials credentials, Filters filters) {
 
         ObjectNode      node = objectMapper.createObjectNode(),
                         currentUserNode = objectMapper.createObjectNode();
@@ -84,52 +84,66 @@ public class Printer {
 
         List<Movie> selectedMovies = new ArrayList<>();
 
-        if (filters.getContains() != null) {
+        //List<Movie> list = (database.getCurrentlyFilteredMovies() != null)
+                        //? database.getCurrentlyFilteredMovies()
+                       // : database.getMovies();
+
+        //if (filters.getContains() != null) {
+            System.out.println("=============Filters");
             for (Movie movie : database.getMovies()) {
                 if (!movie.getCountriesBanned().contains(database.getLoggedUser().getCredentials().getCountry())) {
 
+                    System.out.println("valid movie");
                     boolean containsActors = true;
                     for (String actor : filters.getContains().getActors())
                         if (!movie.getActors().contains(actor)) {
+                            System.out.println("does not contain actors");
                             containsActors = false;
                             break;
                         }
 
                     boolean containsGenre = true;
-                    for (String genre : filters.getContains().getGenre())
+                    for (String genre : filters.getContains().getGenre()) {
+                        System.out.println("genre + " + genre);
                         if (!movie.getGenres().contains(genre)) {
+                            System.out.println("does not contain genres");
                             containsGenre = false;
                             break;
                         }
+                    }
 
-                    if (containsGenre && containsActors)
+                    if (containsGenre && containsActors) {
+                        System.out.println("... " + movie.getName());
                         selectedMovies.add(movie);
+                    }
                 }
             }
-        } else {
+        /*} else {
             for (Movie movie : database.getMovies()) {
                 if (!movie.getCountriesBanned().contains(database.getLoggedUser().getCredentials().getCountry())) {
                     selectedMovies.add(movie);
                 }
             }
-        }
+        }*/
 
         /*
           defibrillation
          */
 
         if (Objects.equals(filters.getSort().getDuration(), " ")
-            && filters.getSort().getRating().matches(Strings.INCREASING)) {
+            && filters.getSort().getRating().equals(Strings.INCREASING)) {
+            System.out.println("..............HERE");
             selectedMovies.sort((Comparator.comparingInt(Movie::getRating)));
         }
 
-        if (filters.getSort().getRating().matches(Strings.DECREASING)
-            && filters.getSort().getDuration().matches(Strings.DECREASING))
+        if (filters.getSort().getRating().equals(Strings.DECREASING)
+            && filters.getSort().getDuration().equals(Strings.DECREASING)) {
             selectedMovies.sort((Comparator.comparingInt(Movie::getRating).reversed()));
             selectedMovies.sort((Comparator.comparingInt(Movie::getDuration).reversed()));
+        }
 
-        if (filters.getSort().getRating().matches(Strings.INCREASING)
-            && filters.getSort().getDuration().matches(Strings.DECREASING)) {
+        if (filters.getSort().getRating().equals(Strings.INCREASING)
+            && filters.getSort().getDuration().equals(Strings.DECREASING)) {
 
             selectedMovies.sort((Comparator.comparingInt(Movie::getRating)));
             selectedMovies.sort((Comparator.comparingInt(Movie::getDuration).reversed()));
@@ -144,6 +158,8 @@ public class Printer {
         node.set("currentUser", currentUserNode);
 
         output.add(node);
+
+        return selectedMovies;
     }
 
     public static void printMovieFromSeeDetails(final Database database, final ArrayNode output, final Credentials credentials, final String movieName) {
@@ -155,7 +171,7 @@ public class Printer {
 
         for (Movie movie : database.getMovies()) {
             if (!movie.getCountriesBanned().contains(credentials.getCountry())
-                    && movie.getName().matches(movieName)) {
+                    && movie.getName().equals(movieName)) {
                     addMovieToArrayNode(movieList, movie);
                     break;
             }
