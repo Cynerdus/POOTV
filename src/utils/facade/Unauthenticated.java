@@ -2,12 +2,15 @@ package utils.facade;
 
 import utils.constants.PageNames;
 
-public class Unauthenticated extends Page{
+public class Unauthenticated extends Page {
 
     public Unauthenticated() {
         addLegalPageSwitches();
     }
 
+    /**
+     *      available pages to switch to for Unauthenticated page
+     */
     @Override
     protected void addLegalPageSwitches() {
         legalPageSwitches.add(PageNames.LOGIN);

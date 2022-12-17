@@ -6,7 +6,6 @@ import utils.constants.FeatureNames;
 import utils.structures.Action;
 import utils.Printer;
 import utils.constants.PageNames;
-import utils.constants.Strings;
 import utils.structures.Credentials;
 import utils.structures.Movie;
 
@@ -41,6 +40,10 @@ public class PageKeeper {
         database.setLoggedUser(null);
     }
 
+    /**
+     *
+     * @param action        command Action for every step
+     */
     public void processPageAction(final Action action) {
 
         String activePageName = getActivePageName();
@@ -58,13 +61,27 @@ public class PageKeeper {
     }
 
     private String getActivePageName() {
-        if (login.isActive())           return PageNames.LOGIN;
-        if (register.isActive())        return PageNames.REGISTER;
-        if (unauthenticated.isActive()) return PageNames.UNAUTHENTICATED;
-        if (movies.isActive())          return PageNames.MOVIES;
-        if (seeDetails.isActive())      return PageNames.SEE_DETAILS;
-        if (upgrades.isActive())        return PageNames.UPGRADES;
-        if (authenticated.isActive())   return PageNames.AUTHENTICATED;
+        if (login.isActive()) {
+            return PageNames.LOGIN;
+        }
+        if (register.isActive()) {
+            return PageNames.REGISTER;
+        }
+        if (unauthenticated.isActive()) {
+            return PageNames.UNAUTHENTICATED;
+        }
+        if (movies.isActive()) {
+            return PageNames.MOVIES;
+        }
+        if (seeDetails.isActive()) {
+            return PageNames.SEE_DETAILS;
+        }
+        if (upgrades.isActive()) {
+            return PageNames.UPGRADES;
+        }
+        if (authenticated.isActive()) {
+            return PageNames.AUTHENTICATED;
+        }
         return "";
     }
 
@@ -72,45 +89,50 @@ public class PageKeeper {
         if (unauthenticated.isPageSwitchLegal(action.getPage())) {
             switchActivityOnUnauthenticated();
 
+            boolean error = false;
             switch (action.getPage()) {
                 case PageNames.LOGIN    -> switchActivityOnLogin();
                 case PageNames.REGISTER -> switchActivityOnRegister();
-                default                 -> {switchActivityOnUnauthenticated();
-                                            Printer.printDefaultError(outputData);}
+                default                 -> switchActivityOnUnauthenticated(error);
             }
-        } else {
-            Printer.printDefaultError(outputData);
+
+            if (!error) {
+                return;
+            }
         }
+
+        Printer.printDefaultError(outputData);
     }
 
     private void processActionOnLoginPage(final Action action) {
         if (login.isPageSwitchLegal(action.getPage())) {
             switchActivityOnLogin();
 
-            if (action.getPage().matches(PageNames.REGISTER)) {
+            boolean error = false;
+            if (action.getPage().equals(PageNames.REGISTER)) {
                 switchActivityOnRegister();
             } else {
-                switchActivityOnUnauthenticated();
+                switchActivityOnUnauthenticated(error);
                 switchActivityOnLogin();
-                Printer.printDefaultError(outputData);
             }
 
-            return;
+            if (!error) {
+                return;
+            }
         }
 
-        if (login.isFeatureLegal(action.getFeature())) {
-            if (login.checkCredentials(database, action.getCredentials())) {
-                switchActivityOnLogin();
-                switchActivityOnAuthenticated();
-                database.setLoggedUser(database.getUserWithCredentials(action.getCredentials()));
-                Printer.printHomePageData(database, outputData, getFullCredentials(action));
-            } else {
-                switchActivityOnLogin();
-                switchActivityOnUnauthenticated();
-                Printer.printDefaultError(outputData);
-            }
+        if (login.checkCredentials(database, action.getCredentials())) {
+
+            switchActivityOnLogin();
+            switchActivityOnAuthenticated();
+
+            database.setLoggedUser(database.getUserWithCredentials(action.getCredentials()));
+            Printer.printHomePageData(database, outputData, getFullCredentials(action));
 
             return;
+        } else {
+            switchActivityOnLogin();
+            switchActivityOnUnauthenticated();
         }
 
         Printer.printDefaultError(outputData);
@@ -120,27 +142,26 @@ public class PageKeeper {
         if (register.isPageSwitchLegal(action.getPage())) {
             switchActivityOnRegister();
 
-            if (action.getPage().matches(PageNames.LOGIN)) {
+            boolean error = false;
+            if (action.getPage().equals(PageNames.LOGIN)) {
                 switchActivityOnLogin();
             } else {
-                switchActivityOnUnauthenticated();
+                switchActivityOnUnauthenticated(error);
                 switchActivityOnRegister();
-                Printer.printDefaultError(outputData);
             }
 
-            return;
+            if (!error) {
+                return;
+            }
         }
 
-        if (register.isFeatureLegal(action.getFeature())) {
-            if (!register.checkCredentials(database, action.getCredentials())) {
-                register.addUserToDatabase(database, action.getCredentials());
-                switchActivityOnRegister();
-                switchActivityOnAuthenticated();
-                database.setLoggedUser(database.getUserWithCredentials(action.getCredentials()));
-                Printer.printHomePageData(database, outputData, getFullCredentials(action));
-            } else {
-                Printer.printDefaultError(outputData);
-            }
+        if (!register.checkCredentials(database, action.getCredentials())) {
+            register.addUserToDatabase(database, action.getCredentials());
+            switchActivityOnRegister();
+            switchActivityOnAuthenticated();
+
+            database.setLoggedUser(database.getUserWithCredentials(action.getCredentials()));
+            Printer.printHomePageData(database, outputData, getFullCredentials(action));
 
             return;
         }
@@ -159,13 +180,14 @@ public class PageKeeper {
                 case PageNames.LOGOUT       -> switchActivityOnUnauthenticated();
                 default                     -> Printer.printDefaultError(outputData);
             }
-        } else {
-            Printer.printDefaultError(outputData);
+
+            return;
         }
+
+        Printer.printDefaultError(outputData);
     }
 
     private void processActionOnMoviesPage(final Action action) {
-        System.out.println("movies");
         if (movies.isPageSwitchLegal(action.getPage())) {
             switchActivityOnMovies();
 
@@ -180,15 +202,20 @@ public class PageKeeper {
         }
 
         if (movies.isFeatureLegal(action.getFeature())) {
-            System.out.println("movie features: " + action.getFeature());
             switch (action.getFeature()) {
-                case FeatureNames.SEARCH    -> Printer.printMoviesBySearch(database, outputData, getLoggedUserCredentials(), action.getStartsWith());
-                case FeatureNames.FILTER
-                        -> {
-                    System.out.println("feature filter");
-                    List<Movie> list = Printer.printMoviesByFilter(database, outputData, getLoggedUserCredentials(), action.getFilters());
-                    database.setCurrentlyFilteredMovies(list);
-                }
+                case FeatureNames.SEARCH    -> Printer.printMoviesBySearch(
+                                                                    database,
+                                                                    outputData,
+                                                                    getLoggedUserCredentials(),
+                                                                    action.getStartsWith());
+                case FeatureNames.FILTER    -> {
+                                                List<Movie> list;
+                                                list = Printer.printMoviesByFilter(
+                                                                    database,
+                                                                    outputData,
+                                                                    getLoggedUserCredentials(),
+                                                                    action.getFilters());
+                                                database.setCurrentlyFilteredMovies(list); }
                 default                     -> Printer.printDefaultError(outputData);
             }
 
@@ -216,14 +243,18 @@ public class PageKeeper {
         if (upgrades.isFeatureLegal(action.getFeature())) {
             boolean rc;
 
-            switch (action.getFeature()) {
-                case FeatureNames.BUY_TOKENS            -> rc = upgrades.buyTokens(action.getCount(), database.getLoggedUser());
-                case FeatureNames.BUY_PREMIUM_ACCOUNT   -> rc = upgrades.buyPremium(database.getLoggedUser());
-                default                                 -> rc = false;
-            }
+            rc = switch (action.getFeature()) {
+                case FeatureNames.BUY_TOKENS            -> upgrades.buyTokens(
+                                                                        action.getCount(),
+                                                                        database.getLoggedUser());
+                case FeatureNames.BUY_PREMIUM_ACCOUNT   -> upgrades.buyPremium(
+                                                                        database.getLoggedUser());
+                default                                 -> false;
+            };
 
-            if (!rc)
+            if (!rc) {
                 Printer.printDefaultError(outputData);
+            }
 
             return;
         }
@@ -251,21 +282,21 @@ public class PageKeeper {
             case FeatureNames.PURCHASE  -> activatePurchaseFeature(action);
             case FeatureNames.LIKE      -> activateLikeFeature(action);
             case FeatureNames.RATE      -> activateRateFeature(action);
-            case FeatureNames.FILTER
-                    -> {
-                System.out.println("feature filter");
-                List<Movie> list = Printer.printMoviesByFilter(database, outputData, getLoggedUserCredentials(), action.getFilters());
-                database.setCurrentlyFilteredMovies(list);
-            }
+            case FeatureNames.FILTER    -> {
+                                                List<Movie> list;
+                                                list = Printer.printMoviesByFilter(database,
+                                                                    outputData,
+                                                                    getLoggedUserCredentials(),
+                                                                    action.getFilters());
+                                            database.setCurrentlyFilteredMovies(list); }
             default                     -> Printer.printDefaultError(outputData);
         }
     }
 
     private void throwInternalError() {
-        System.out.println("err");
     }
 
-    private Credentials getFullCredentials(Action action) {
+    private Credentials getFullCredentials(final Action action) {
         return database.getUserWithCredentials(action.getCredentials()).getCredentials();
     }
 
@@ -275,61 +306,91 @@ public class PageKeeper {
 
     private Movie getMovieFromDatabase(final String name) {
         for (Movie movie : database.getMovies()) {
-            if (movie.getName().equals(name))
+            if (movie.getName().equals(name)) {
                 return movie;
+            }
         }
         return null;
     }
 
     private void activateWatchFeature(final Action action) {
-        Movie movie = (database.getCurrentMovieOnScreen() != null) ? database.getCurrentMovieOnScreen()
-                : (action.getMovie() != null) ? getMovieFromDatabase(action.getMovie()) : null;
+        Movie movie = (database.getCurrentMovieOnScreen() != null)
+                ? database.getCurrentMovieOnScreen()
+                : (action.getMovie() != null)
+                ? getMovieFromDatabase(action.getMovie()) : null;
 
         if (movie != null && database.getLoggedUser().getPurchasedMovies().contains(movie)) {
             seeDetails.addMovieToWatchList(movie, database.getLoggedUser());
-            Printer.printMovieFromSeeDetails(database, outputData, database.getLoggedUser().getCredentials(), movie.getName());
-        } else
+
+            Credentials credentials = database.getLoggedUser().getCredentials();
+            Printer.printMovieFromSeeDetails(database, outputData, credentials, movie.getName());
+        } else {
             Printer.printDefaultError(outputData);
+        }
     }
 
     private void activatePurchaseFeature(final Action action) {
-        Movie movie = (database.getCurrentMovieOnScreen() != null) ? database.getCurrentMovieOnScreen()
-                : (action.getMovie() != null) ? getMovieFromDatabase(action.getMovie()) : null;
+        Movie movie = (database.getCurrentMovieOnScreen() != null)
+                ? database.getCurrentMovieOnScreen()
+                : (action.getMovie() != null)
+                ? getMovieFromDatabase(action.getMovie()) : null;
 
         if (movie != null && !database.getLoggedUser().getPurchasedMovies().contains(movie)) {
             boolean rc = seeDetails.addMovieToPurchasedList(movie, database.getLoggedUser());
-            if (rc)
-                Printer.printMovieFromSeeDetails(database, outputData, database.getLoggedUser().getCredentials(), movie.getName());
-            else
+            if (rc) {
+                Credentials credentials = database.getLoggedUser().getCredentials();
+                Printer.printMovieFromSeeDetails(database,
+                                                outputData,
+                                                credentials,
+                                                movie.getName());
+            } else {
                 Printer.printDefaultError(outputData);
-        } else
+            }
+        } else {
             Printer.printDefaultError(outputData);
+        }
     }
 
     private void activateLikeFeature(final Action action) {
-        Movie movie = (database.getCurrentMovieOnScreen() != null) ? database.getCurrentMovieOnScreen()
-                : (action.getMovie() != null) ? getMovieFromDatabase(action.getMovie()) : null;
+        Movie movie = (database.getCurrentMovieOnScreen() != null)
+                    ? database.getCurrentMovieOnScreen()
+                    : (action.getMovie() != null)
+                    ? getMovieFromDatabase(action.getMovie()) : null;
 
         if (movie != null && database.getLoggedUser().getPurchasedMovies().contains(movie)) {
             seeDetails.addMovieToLikedList(movie, database.getLoggedUser());
-            Printer.printMovieFromSeeDetails(database, outputData, database.getLoggedUser().getCredentials(), movie.getName());
-        } else
+
+            Credentials credentials = database.getLoggedUser().getCredentials();
+            Printer.printMovieFromSeeDetails(database, outputData, credentials, movie.getName());
+        } else {
             Printer.printDefaultError(outputData);
+        }
 
     }
 
     private void activateRateFeature(final Action action) {
-        Movie movie = (database.getCurrentMovieOnScreen() != null) ? database.getCurrentMovieOnScreen()
-                : (action.getMovie() != null) ? getMovieFromDatabase(action.getMovie()) : null;
+        Movie movie = (database.getCurrentMovieOnScreen() != null)
+                    ? database.getCurrentMovieOnScreen()
+                    : (action.getMovie() != null)
+                    ? getMovieFromDatabase(action.getMovie()) : null;
 
         if (movie != null && database.getLoggedUser().getPurchasedMovies().contains(movie)) {
-            boolean rc = seeDetails.addMovieToRatedList(movie, database.getLoggedUser(), action.getRate());
-            if (rc)
-                Printer.printMovieFromSeeDetails(database, outputData, database.getLoggedUser().getCredentials(), movie.getName());
-            else
+            Credentials credentials = database.getLoggedUser().getCredentials();
+
+            boolean rc = seeDetails.addMovieToRatedList(movie,
+                                                        database.getLoggedUser(),
+                                                        action.getRate());
+            if (rc) {
+                Printer.printMovieFromSeeDetails(database,
+                                                outputData,
+                                                credentials,
+                                                movie.getName());
+            } else {
                 Printer.printDefaultError(outputData);
-        } else
+            }
+        } else {
             Printer.printDefaultError(outputData);
+        }
     }
 
     private void switchActivityOnLogin() {
@@ -342,6 +403,10 @@ public class PageKeeper {
 
     private void switchActivityOnUnauthenticated() {
         unauthenticated.activeSwitch();
+    }
+    private void switchActivityOnUnauthenticated(boolean error) {
+        unauthenticated.activeSwitch();
+        error = true;
     }
 
     private void switchActivityOnAuthenticated() {
@@ -364,10 +429,12 @@ public class PageKeeper {
 
         seeDetails.activeSwitch();
         database.setCurrentMovieOnScreen(movie);
-        if (movie != null && !movie.getCountriesBanned().contains(database.getLoggedUser().getCredentials().getCountry())) {
-            Printer.printMovieFromSeeDetails(database, outputData, database.getLoggedUser().getCredentials(), movieName);
-        }
-        else {
+        if (movie != null && !movie.getCountriesBanned()
+            .contains(database.getLoggedUser().getCredentials().getCountry())) {
+
+            Credentials credentials = database.getLoggedUser().getCredentials();
+            Printer.printMovieFromSeeDetails(database, outputData, credentials, movieName);
+        } else {
             database.setCurrentMovieOnScreen(null);
             Printer.printDefaultError(outputData);
         }

@@ -1,5 +1,7 @@
 package utils.structures;
 
+import utils.constants.Numbers;
+
 public class Credentials {
 
     private String name;
@@ -8,7 +10,7 @@ public class Credentials {
     private String country;
     private int balance;
     private int tokens;
-    private int numFreePremiumMovies = 15;
+    private int numFreePremiumMovies = Numbers.FIFTEEN;
 
     public Credentials() { }
 
@@ -92,41 +94,80 @@ public class Credentials {
         this.balance = balance;
     }
 
-    public void addBalance(final int balance) {
-        this.balance += balance;
+    /**
+     *
+     * @param plusBalance       currency
+     */
+    public void addBalance(final int plusBalance) {
+        this.balance += plusBalance;
     }
 
-    public void subtractBalance(final int balance) {
-        this.balance -= balance;
+    /**
+     *
+     * @param subBalance       currency
+     */
+    public void subtractBalance(final int subBalance) {
+        this.balance -= subBalance;
     }
+
+    /**
+     *
+     * @return      number of tokens
+     */
     public int getTokens() {
         return tokens;
     }
 
+    /**
+     *
+     * @param tokens        number of tokens
+     */
     public void setTokens(final int tokens) {
         this.tokens = tokens;
     }
 
-    public void addTokens(final int tokens) {
-        this.tokens += tokens;
+    /**
+     *
+     * @param plusTokens        number of tokens to be added
+     */
+    public void addTokens(final int plusTokens) {
+        this.tokens += plusTokens;
     }
 
-    public void subtractTokens(final int tokens) {
-        this.tokens -= tokens;
+    /**
+     *
+     * @param subTokens        number of tokens to be subtracted
+     */
+    public void subtractTokens(final int subTokens) {
+        this.tokens -= subTokens;
     }
 
+    /**
+     *
+     * @return      number of free movies
+     */
     public int getNumFreePremiumMovies() {
         return numFreePremiumMovies;
     }
 
+    /**
+     *
+     * @param numFreePremiumMovies      number of free movies
+     */
     public void setNumFreePremiumMovies(final int numFreePremiumMovies) {
         this.numFreePremiumMovies = numFreePremiumMovies;
     }
 
+    /**
+     *      decrements the number of free movies on premium account
+     */
     public void decrementNumFreePremiumMovies() {
         this.numFreePremiumMovies--;
     }
 
+    /**
+     *      increments the number of free movies on premium account
+     */
     public void incrementNumFreePremiumMovies() {
         this.numFreePremiumMovies++;
     }

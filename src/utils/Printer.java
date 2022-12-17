@@ -3,24 +3,35 @@ package utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.POJONode;
+
 import utils.constants.Strings;
-import utils.structures.*;
+import utils.structures.Credentials;
+import utils.structures.Filters;
+import utils.structures.Movie;
+import utils.structures.User;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
-public class Printer {
+public final class Printer {
 
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public static void printHomePageData(Database database, ArrayNode output, Credentials credentials) {
+    /**
+     *
+     * @param database          application's database for movies and users
+     * @param output            output node in .json
+     * @param credentials       current user's credentials
+     */
+    public static void printHomePageData(final Database database,
+                                         final ArrayNode output,
+                                         final Credentials credentials) {
 
-        ObjectNode      node = objectMapper.createObjectNode(),
-                        currentUserNode = objectMapper.createObjectNode();
-        ArrayNode       movieList = objectMapper.createArrayNode();
+        ObjectNode      node = OBJECT_MAPPER.createObjectNode(),
+                        currentUserNode = OBJECT_MAPPER.createObjectNode();
+        ArrayNode       movieList = OBJECT_MAPPER.createArrayNode();
 
         printUserNode(currentUserNode, database.getLoggedUser());
 
@@ -31,11 +42,19 @@ public class Printer {
         output.add(node);
     }
 
-    public static void printMovieListData(Database database, ArrayNode output, Credentials credentials) {
+    /**
+     *
+     * @param database          application's database for movies and users
+     * @param output            output node in .json
+     * @param credentials       current user's credentials
+     */
+    public static void printMovieListData(final Database database,
+                                          final ArrayNode output, final
+                                          Credentials credentials) {
 
-        ObjectNode      node = objectMapper.createObjectNode(),
-                        currentUserNode = objectMapper.createObjectNode();
-        ArrayNode       movieList = objectMapper.createArrayNode();
+        ObjectNode      node = OBJECT_MAPPER.createObjectNode(),
+                        currentUserNode = OBJECT_MAPPER.createObjectNode();
+        ArrayNode       movieList = OBJECT_MAPPER.createArrayNode();
 
         printUserNode(currentUserNode, database.getLoggedUser());
 
@@ -52,11 +71,21 @@ public class Printer {
         output.add(node);
     }
 
-    public static void printMoviesBySearch(Database database, ArrayNode output, Credentials credentials, String startsWith) {
+    /**
+     *
+     * @param database          application's database for movies and users
+     * @param output            output node in .json
+     * @param credentials       current user's credentials
+     * @param startsWith        prefix string for movie search
+     */
+    public static void printMoviesBySearch(final Database database,
+                                           final ArrayNode output,
+                                           final Credentials credentials,
+                                           final String startsWith) {
 
-        ObjectNode      node = objectMapper.createObjectNode(),
-                        currentUserNode = objectMapper.createObjectNode();
-        ArrayNode       movieList = objectMapper.createArrayNode();
+        ObjectNode      node = OBJECT_MAPPER.createObjectNode(),
+                        currentUserNode = OBJECT_MAPPER.createObjectNode();
+        ArrayNode       movieList = OBJECT_MAPPER.createArrayNode();
 
         printUserNode(currentUserNode, database.getLoggedUser());
 
@@ -74,57 +103,51 @@ public class Printer {
         output.add(node);
     }
 
-    public static List<Movie> printMoviesByFilter(Database database, ArrayNode output, Credentials credentials, Filters filters) {
+    /**
+     *
+     * @param database          application's database for movies and users
+     * @param output            output node in .json
+     * @param credentials       current user's credentials
+     * @param filters           filters to be applied on movie list
+     * @return                  the resulted filtered movie list
+     */
+    public static List<Movie> printMoviesByFilter(final Database database,
+                                                  final ArrayNode output,
+                                                  final Credentials credentials,
+                                                  final Filters filters) {
 
-        ObjectNode      node = objectMapper.createObjectNode(),
-                        currentUserNode = objectMapper.createObjectNode();
-        ArrayNode       movieList = objectMapper.createArrayNode();
+        ObjectNode      node = OBJECT_MAPPER.createObjectNode(),
+                        currentUserNode = OBJECT_MAPPER.createObjectNode();
+        ArrayNode       movieList = OBJECT_MAPPER.createArrayNode();
 
         printUserNode(currentUserNode, database.getLoggedUser());
 
         List<Movie> selectedMovies = new ArrayList<>();
+        for (Movie movie : database.getMovies()) {
+            String country = database.getLoggedUser().getCredentials().getCountry();
+            if (!movie.getCountriesBanned().contains(country)) {
 
-        //List<Movie> list = (database.getCurrentlyFilteredMovies() != null)
-                        //? database.getCurrentlyFilteredMovies()
-                       // : database.getMovies();
-
-        //if (filters.getContains() != null) {
-            System.out.println("=============Filters");
-            for (Movie movie : database.getMovies()) {
-                if (!movie.getCountriesBanned().contains(database.getLoggedUser().getCredentials().getCountry())) {
-
-                    System.out.println("valid movie");
-                    boolean containsActors = true;
-                    for (String actor : filters.getContains().getActors())
-                        if (!movie.getActors().contains(actor)) {
-                            System.out.println("does not contain actors");
-                            containsActors = false;
-                            break;
-                        }
-
-                    boolean containsGenre = true;
-                    for (String genre : filters.getContains().getGenre()) {
-                        System.out.println("genre + " + genre);
-                        if (!movie.getGenres().contains(genre)) {
-                            System.out.println("does not contain genres");
-                            containsGenre = false;
-                            break;
-                        }
-                    }
-
-                    if (containsGenre && containsActors) {
-                        System.out.println("... " + movie.getName());
-                        selectedMovies.add(movie);
+                boolean containsActors = true;
+                for (String actor : filters.getContains().getActors()) {
+                    if (!movie.getActors().contains(actor)) {
+                        containsActors = false;
+                        break;
                     }
                 }
-            }
-        /*} else {
-            for (Movie movie : database.getMovies()) {
-                if (!movie.getCountriesBanned().contains(database.getLoggedUser().getCredentials().getCountry())) {
+
+                boolean containsGenre = true;
+                for (String genre : filters.getContains().getGenre()) {
+                    if (!movie.getGenres().contains(genre)) {
+                        containsGenre = false;
+                        break;
+                    }
+                }
+
+                if (containsGenre && containsActors) {
                     selectedMovies.add(movie);
                 }
             }
-        }*/
+        }
 
         /*
           defibrillation
@@ -132,7 +155,6 @@ public class Printer {
 
         if (Objects.equals(filters.getSort().getDuration(), " ")
             && filters.getSort().getRating().equals(Strings.INCREASING)) {
-            System.out.println("..............HERE");
             selectedMovies.sort((Comparator.comparingInt(Movie::getRating)));
         }
 
@@ -162,10 +184,21 @@ public class Printer {
         return selectedMovies;
     }
 
-    public static void printMovieFromSeeDetails(final Database database, final ArrayNode output, final Credentials credentials, final String movieName) {
-        ObjectNode      node = objectMapper.createObjectNode(),
-                        currentUserNode = objectMapper.createObjectNode();
-        ArrayNode       movieList = objectMapper.createArrayNode();
+    /**
+     *
+     * @param database          application's database for movies and users
+     * @param output            output node in .json
+     * @param credentials       current user's credentials
+     * @param movieName         target movie name
+     */
+    public static void printMovieFromSeeDetails(final Database database,
+                                                final ArrayNode output,
+                                                final Credentials credentials,
+                                                final String movieName) {
+
+        ObjectNode      node = OBJECT_MAPPER.createObjectNode(),
+                        currentUserNode = OBJECT_MAPPER.createObjectNode();
+        ArrayNode       movieList = OBJECT_MAPPER.createArrayNode();
 
         printUserNode(currentUserNode, database.getLoggedUser());
 
@@ -184,9 +217,13 @@ public class Printer {
         output.add(node);
     }
 
+    /**
+     *
+     * @param output        the output node
+     */
     public static void printDefaultError(final ArrayNode output) {
-        ObjectNode      node = objectMapper.createObjectNode();
-        ArrayNode       movieList = objectMapper.createArrayNode();
+        ObjectNode      node = OBJECT_MAPPER.createObjectNode();
+        ArrayNode       movieList = OBJECT_MAPPER.createArrayNode();
 
         node.put("error", "Error");
         node.set("currentMoviesList", movieList);
@@ -195,20 +232,23 @@ public class Printer {
         output.add(node);
     }
 
-    private static void addMovieToArrayNode(ArrayNode moviesNode, Movie movie) {
-        ObjectNode      movieNode = objectMapper.createObjectNode();
-        ArrayNode       genresNode = objectMapper.createArrayNode(),
-                        actorsNode = objectMapper.createArrayNode(),
-                        countriesNode = objectMapper.createArrayNode();
+    private static void addMovieToArrayNode(final ArrayNode moviesNode, final Movie movie) {
+        ObjectNode      movieNode = OBJECT_MAPPER.createObjectNode();
+        ArrayNode       genresNode = OBJECT_MAPPER.createArrayNode(),
+                        actorsNode = OBJECT_MAPPER.createArrayNode(),
+                        countriesNode = OBJECT_MAPPER.createArrayNode();
 
-        for (String genre : movie.getGenres())
+        for (String genre : movie.getGenres()) {
             genresNode.add(genre);
+        }
 
-        for (String actor : movie.getActors())
+        for (String actor : movie.getActors()) {
             actorsNode.add(actor);
+        }
 
-        for (String country : movie.getCountriesBanned())
+        for (String country : movie.getCountriesBanned()) {
             countriesNode.add(country);
+        }
 
         movieNode.put("name", movie.getName())
                  .put("year", movie.getYear())
@@ -220,7 +260,8 @@ public class Printer {
 
         movieNode.put("numLikes", movie.getNumLikes());
 
-        movieNode.put("rating", (movie.getNumRatings() == 0) ? 0.00 : ((float)movie.getRating() / movie.getNumRatings()));
+        movieNode.put("rating", (movie.getNumRatings() == 0) ? 0.00
+                                        : ((float) movie.getRating() / movie.getNumRatings()));
 
         movieNode.put("numRatings", movie.getNumRatings());
 
@@ -231,24 +272,28 @@ public class Printer {
 
         Credentials credentials = user.getCredentials();
 
-        ArrayNode purchasedMovies = objectMapper.createArrayNode(),
-                watchedMovies = objectMapper.createArrayNode(),
-                likedMovies = objectMapper.createArrayNode(),
-                ratedMovies = objectMapper.createArrayNode();
+        ArrayNode purchasedMovies = OBJECT_MAPPER.createArrayNode(),
+                watchedMovies = OBJECT_MAPPER.createArrayNode(),
+                likedMovies = OBJECT_MAPPER.createArrayNode(),
+                ratedMovies = OBJECT_MAPPER.createArrayNode();
 
-        ObjectNode credentialsNode = objectMapper.createObjectNode();
+        ObjectNode credentialsNode = OBJECT_MAPPER.createObjectNode();
 
-        for (Movie movie : user.getPurchasedMovies())
+        for (Movie movie : user.getPurchasedMovies()) {
             addMovieToArrayNode(purchasedMovies, movie);
+        }
 
-        for (Movie movie : user.getWatchedMovies())
+        for (Movie movie : user.getWatchedMovies()) {
             addMovieToArrayNode(watchedMovies, movie);
+        }
 
-        for (Movie movie : user.getLikedMovies())
+        for (Movie movie : user.getLikedMovies()) {
             addMovieToArrayNode(likedMovies, movie);
+        }
 
-        for (Movie movie : user.getRatedMovies())
+        for (Movie movie : user.getRatedMovies()) {
             addMovieToArrayNode(ratedMovies, movie);
+        }
 
         credentialsNode.put("name", credentials.getName())
                 .put("password", credentials.getPassword())

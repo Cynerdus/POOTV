@@ -1,7 +1,5 @@
 package utils.structures;
 
-import utils.structures.Credentials;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,38 +30,75 @@ public class User {
         this.credentials = credentials;
     }
 
+    /**
+     *
+     * @return          watched movies list
+     */
     public List<Movie> getWatchedMovies() {
         return watchedMovies;
     }
 
+    /**
+     *
+     * @param watchedMovies     watched movies list
+     */
     public void setWatchedMovies(final List<Movie> watchedMovies) {
         this.watchedMovies = watchedMovies;
     }
 
+    /**
+     *
+     * @return          purchased movies list
+     */
     public List<Movie> getPurchasedMovies() {
         return purchasedMovies;
     }
 
+    /**
+     *
+     * @param purchasedMovies       purchased movies list
+     */
     public void setPurchasedMovies(final List<Movie> purchasedMovies) {
         this.purchasedMovies = purchasedMovies;
     }
 
+    /**
+     *
+     * @return          liked movies list
+     */
     public List<Movie> getLikedMovies() {
         return likedMovies;
     }
 
+    /**
+     *
+     * @param likedMovies       liked movies list
+     */
     public void setLikedMovies(final List<Movie> likedMovies) {
         this.likedMovies = likedMovies;
     }
 
+    /**
+     *
+     * @return          rated movies list
+     */
     public List<Movie> getRatedMovies() {
         return ratedMovies;
     }
 
+    /**
+     *
+     * @param ratedMovies       rated movies list
+     */
     public void setRatedMovies(final List<Movie> ratedMovies) {
         this.ratedMovies = ratedMovies;
     }
 
+    /**
+     *
+     * @param movieList     general list
+     * @param movie         movie to be added
+     */
     public void addMovieToList(final List<Movie> movieList, final Movie movie) {
         movieList.add(movie);
     }

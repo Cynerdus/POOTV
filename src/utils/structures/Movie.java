@@ -112,34 +112,64 @@ public class Movie {
         this.countriesBanned = countriesBanned;
     }
 
+    /**
+     *
+     * @return      movie rating
+     */
     public int getRating() {
         return rating;
     }
 
-    public void setRating(int rating) {
+    /**
+     *
+     * @param rating        movie rating
+     */
+    public void setRating(final int rating) {
         this.rating = rating;
     }
 
+    /**
+     *
+     * @return          number of likes
+     */
     public int getNumLikes() {
         return numLikes;
     }
 
-    public void setNumLikes(int numLikes) {
+    /**
+     *
+     * @param numLikes      number of likes
+     */
+    public void setNumLikes(final int numLikes) {
         this.numLikes = numLikes;
     }
 
+    /**
+     *      increments the number of likes for movie
+     */
     public void incrementNumLikes() {
         this.numLikes++;
     }
 
+    /**
+     *
+     * @return          number of ratings
+     */
     public int getNumRatings() {
         return numRatings;
     }
 
-    public void setNumRatings(int numRatings) {
+    /**
+     *
+     * @param numRatings        number of ratings
+     */
+    public void setNumRatings(final int numRatings) {
         this.numRatings = numRatings;
     }
 
+    /**
+     *      increments the number of ratings for movie
+     */
     public void incrementNumRatings() {
         this.numRatings++;
     }

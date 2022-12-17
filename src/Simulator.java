@@ -36,6 +36,9 @@ public class Simulator {
         return outputData;
     }
 
+    /**
+     *          run every registered action
+     */
     public void simulateCommands() {
         PageKeeper pageKeeper = new PageKeeper(database, outputData);
 

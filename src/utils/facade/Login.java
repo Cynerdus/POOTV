@@ -5,26 +5,37 @@ import utils.constants.FeatureNames;
 import utils.constants.PageNames;
 import utils.structures.Credentials;
 
-import javax.xml.crypto.Data;
-
-public class Login extends Page{
+public class Login extends Page {
 
     public Login() {
         addLegalFeatures();
         addLegalPageSwitches();
     }
 
+    /**
+     *      available features for Login page
+     */
     @Override
     protected void addLegalFeatures() {
         legalFeatures.add(FeatureNames.LOGIN);
     }
 
+    /**
+     *      available page switches for Login page
+     */
     @Override
     protected void addLegalPageSwitches() {
         legalPageSwitches.add(PageNames.REGISTER);
     }
 
-    public boolean checkCredentials(Database database, Credentials credentials) {
+    /**
+     *
+     * @param database          database for movies and users
+     * @param credentials       user's credentials
+     * @return                  true if the user can be found within the database
+     *                          false otherwise
+     */
+    public boolean checkCredentials(final Database database, final Credentials credentials) {
         return database.isUserWithCredentialsRegistered(credentials);
     }
 }
