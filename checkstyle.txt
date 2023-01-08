@@ -1,4 +1,9 @@
 Starting audit...
+[ERROR] D:\Programming\Java Stuff\POOTV\.\src\Test.java:1: File does not end with a newline. [NewlineAtEndOfFile]
+[ERROR] D:\Programming\Java Stuff\POOTV\.\src\Test.java:9:28: Using the '.*' form of import should be avoided - java.util.concurrent.*. [AvoidStarImport]
+[ERROR] D:\Programming\Java Stuff\POOTV\.\src\Test.java:158: Line is longer than 100 characters (found 108). [LineLength]
+[ERROR] D:\Programming\Java Stuff\POOTV\.\src\Test.java:206:65: Parameter testFileName should be final. [FinalParameters]
+[ERROR] D:\Programming\Java Stuff\POOTV\.\src\Test.java:222: Line is longer than 100 characters (found 108). [LineLength]
 [ERROR] D:\Programming\Java Stuff\POOTV\.\src\utils\facade\PageKeeper.java:407:50: Parameter error should be final. [FinalParameters]
 Audit done.
-Checkstyle ends with 1 errors.
+Checkstyle ends with 6 errors.
