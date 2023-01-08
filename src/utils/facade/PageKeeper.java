@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import utils.Database;
 import utils.constants.FeatureNames;
 import utils.constants.Strings;
+import utils.memento.BackButton;
+import utils.memento.Originator;
 import utils.structures.*;
 import utils.Printer;
 import utils.constants.PageNames;
@@ -23,6 +25,9 @@ public class PageKeeper {
     private final SeeDetails seeDetails;
     private final Upgrades upgrades;
     private final Authenticated authenticated;
+
+    private final Originator originator = new Originator();
+    private final BackButton backButton = new BackButton();
 
     public PageKeeper(final Database database, final ArrayNode outputData) {
         this.database = database;
@@ -65,7 +70,7 @@ public class PageKeeper {
             && database.getLoggedUser().getCredentials().getAccountType().equals(Strings.PREMIUM)) {
 
             List<Movie> likedMovies = database.getLoggedUser().getLikedMovies();
-            Hashtable<String, Integer> genreLikes = new Hashtable<String, Integer>();
+            Hashtable<String, Integer> genreLikes = new Hashtable<>();
             for (Movie movie : likedMovies) {
                 for (String genre : movie.getGenres()) {
                     if (!genreLikes.containsKey(genre)) {
@@ -108,11 +113,14 @@ public class PageKeeper {
     }
 
     public void processBackButton() {
-        String backPage;
+        String backPage = "",
+               currentPage = "";
+        int size = backButton.getPageQueueSize();
 
-        if (database.getPageStack().size() > 1) {
-            String currentPage = database.getPageStack().get(database.getPageStack().size() - 1);
-            backPage = database.getPageStack().get(database.getPageStack().size() - 2);
+        if (size > 1) {
+            currentPage = originator.getState();
+            originator.getStateFromMemento(backButton.getPage(size - 2));
+            backPage = originator.getState();
 
             if (backPage.equals(PageNames.LOGIN) || backPage.equals(PageNames.REGISTER)) {
                 Printer.printDefaultError(outputData);
@@ -131,14 +139,12 @@ public class PageKeeper {
                 default                         -> throwInternalError();
             }
 
-            database.getPageStack().remove(database.getPageStack().size() - 1);
+            backButton.removeLastPage();
         } else {
             backPage = "";
         }
 
         switch (backPage) {
-            case PageNames.LOGIN            -> switchActivityOnLogin();
-            case PageNames.REGISTER         -> switchActivityOnRegister();
             case PageNames.AUTHENTICATED    -> switchActivityOnAuthenticated();
             case PageNames.MOVIES           -> switchActivityOnMovies(new Action());
             case PageNames.UPGRADES         -> switchActivityOnUpgrades();
@@ -232,7 +238,7 @@ public class PageKeeper {
             }
 
             if (!error) {
-                database.getPageStack().add(action.getPage());
+                savePageToQueue(action.getPage());
                 return;
             }
         }
@@ -246,7 +252,7 @@ public class PageKeeper {
 
             boolean error = false;
             if (action.getPage().equals(PageNames.REGISTER)) {
-                database.getPageStack().add(action.getPage());
+                savePageToQueue(action.getPage());
                 switchActivityOnRegister();
             } else {
                 switchActivityOnUnauthenticated(error);
@@ -281,7 +287,7 @@ public class PageKeeper {
 
             boolean error = false;
             if (action.getPage().equals(PageNames.LOGIN)) {
-                database.getPageStack().add(action.getPage());
+                savePageToQueue(action.getPage());
                 switchActivityOnLogin();
             } else {
                 switchActivityOnUnauthenticated(error);
@@ -319,7 +325,7 @@ public class PageKeeper {
                 default                     -> Printer.printDefaultError(outputData);
             }
 
-            database.getPageStack().add(action.getPage());
+            savePageToQueue(action.getPage());
             return;
         }
 
@@ -337,7 +343,7 @@ public class PageKeeper {
                 default                     -> Printer.printDefaultError(outputData);
             }
 
-            database.getPageStack().add(action.getPage());
+            savePageToQueue(action.getPage());
             return;
         }
 
@@ -377,7 +383,7 @@ public class PageKeeper {
                 default                     -> Printer.printDefaultError(outputData);
             }
 
-            database.getPageStack().add(action.getPage());
+            savePageToQueue(action.getPage());
             return;
         }
 
@@ -415,7 +421,7 @@ public class PageKeeper {
                 default                     -> Printer.printDefaultError(outputData);
             }
 
-            database.getPageStack().add(action.getPage());
+            savePageToQueue(action.getPage());
             return;
         }
 
@@ -599,5 +605,10 @@ public class PageKeeper {
 
     private void switchActivityOnUpgrades() {
         upgrades.activeSwitch();
+    }
+
+    private void savePageToQueue(String page) {
+        originator.setState(page);
+        backButton.addPage(originator.saveToMemento());
     }
 }

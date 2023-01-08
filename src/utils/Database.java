@@ -18,8 +18,6 @@ public class Database {
     private Movie currentMovieOnScreen = null;
     private List<Movie> currentlyFilteredMovies = null;
 
-    private List<String> pageStack = new ArrayList<>();
-
     public Database() {
 
     }
@@ -222,13 +220,5 @@ public class Database {
             }
         }
         return null;
-    }
-
-    public List<String> getPageStack() {
-        return pageStack;
-    }
-
-    public void setPageStack(List<String> pageStack) {
-        this.pageStack = pageStack;
     }
 }
