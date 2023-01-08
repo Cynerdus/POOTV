@@ -44,10 +44,15 @@ public class Simulator {
         PageKeeper pageKeeper = new PageKeeper(database, outputData);
 
         for (Action action : inputData.getActions()) {
-            if (action.getType().equals(Strings.DATABASE)) {
-                pageKeeper.processDatabaseModification(action);
-            } else {
-                pageKeeper.processPageAction(action);
+            switch (action.getType()) {
+                case Strings.ON_PAGE,
+                     Strings.CHANGE_PAGE -> pageKeeper.processPageAction(action);
+                case Strings.DATABASE -> pageKeeper.processDatabaseModification(action);
+                case Strings.BACK -> pageKeeper.processBackButton();
+            }
+
+            if (inputData.getActions().indexOf(action) == inputData.getActions().size() - 1) {
+                pageKeeper.processRecommendationsForPremium();
             }
         }
     }

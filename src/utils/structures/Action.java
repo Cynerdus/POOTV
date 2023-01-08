@@ -14,6 +14,7 @@ public class Action {
     private String subscribedGenre;
 
     private Movie addedMovie;
+    private String deletedMovie;
 
     public Action() { }
 
@@ -175,5 +176,13 @@ public class Action {
 
     public void setAddedMovie(Movie addedMovie) {
         this.addedMovie = addedMovie;
+    }
+
+    public String getDeletedMovie() {
+        return deletedMovie;
+    }
+
+    public void setDeletedMovie(String deletedMovie) {
+        this.deletedMovie = deletedMovie;
     }
 }

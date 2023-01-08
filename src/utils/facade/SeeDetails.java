@@ -44,7 +44,9 @@ public class SeeDetails extends Page {
      * @param user          current user
      */
     public void addMovieToWatchList(final Movie movie, final User user) {
-        if (user.getPurchasedMovies().contains(movie)) {
+        if (user.getPurchasedMovies().contains(movie)
+            && !user.getWatchedMovies().contains(movie)) {
+
             user.addMovieToList(user.getWatchedMovies(), movie);
         }
     }
@@ -79,7 +81,8 @@ public class SeeDetails extends Page {
      * @param user          current user
      */
     public void addMovieToLikedList(final Movie movie, final User user) {
-        if (user.getPurchasedMovies().contains(movie)) {
+        if (user.getPurchasedMovies().contains(movie)
+            && !user.getLikedMovies().contains(movie)) {
             user.addMovieToList(user.getLikedMovies(), movie);
             movie.incrementNumLikes();
         }
@@ -99,9 +102,18 @@ public class SeeDetails extends Page {
                 return false;
             }
 
-            user.addMovieToList(user.getRatedMovies(), movie);
-            movie.setRating(movie.getRating() + rating);
-            movie.incrementNumRatings();
+            if (!user.getRatedMovies().contains(movie)) {
+                user.addMovieToList(user.getRatedMovies(), movie);
+                user.getRatedMoviesRates().add(rating);
+                movie.setRating(movie.getRating() + rating);
+                movie.incrementNumRatings();
+            } else {
+                int index = user.getRatedMovies().indexOf(movie);
+                movie.setRating(movie.getRating() - user.getRatedMoviesRates().get(index));
+                user.getRatedMoviesRates().set(index, rating);
+                movie.setRating(movie.getRating() + rating);
+            }
+
             return true;
         }
         return false;

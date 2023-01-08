@@ -16,6 +16,7 @@ public final class FeatureNames {
     public static final String SUBSCRIBE = "subscribe";
 
     public static final String ADD = "add";
+    public static final String DELETE = "delete";
 
     private FeatureNames() { }
 }

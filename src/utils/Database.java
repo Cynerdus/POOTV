@@ -4,6 +4,8 @@ import utils.structures.Credentials;
 import utils.structures.Movie;
 import utils.structures.User;
 
+import java.security.Key;
+import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +17,8 @@ public class Database {
     private User loggedUser = null;
     private Movie currentMovieOnScreen = null;
     private List<Movie> currentlyFilteredMovies = null;
+
+    private List<String> pageStack = new ArrayList<>();
 
     public Database() {
 
@@ -218,5 +222,13 @@ public class Database {
             }
         }
         return null;
+    }
+
+    public List<String> getPageStack() {
+        return pageStack;
+    }
+
+    public void setPageStack(List<String> pageStack) {
+        this.pageStack = pageStack;
     }
 }

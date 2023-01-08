@@ -15,6 +15,8 @@ public class User {
 
     private List<String> subscriptions = new ArrayList<>();
 
+    private List<Integer> ratedMoviesRates = new ArrayList<>();
+
     public User() { }
 
     /**
@@ -120,5 +122,13 @@ public class User {
 
     public void setSubscriptions(List<String> subscriptions) {
         this.subscriptions = subscriptions;
+    }
+
+    public List<Integer> getRatedMoviesRates() {
+        return ratedMoviesRates;
+    }
+
+    public void setRatedMoviesRates(List<Integer> ratedMoviesRates) {
+        this.ratedMoviesRates = ratedMoviesRates;
     }
 }

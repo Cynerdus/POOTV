@@ -8,8 +8,8 @@ import utils.structures.*;
 import utils.Printer;
 import utils.constants.PageNames;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.security.KeyStore;
+import java.util.*;
 
 public class PageKeeper {
 
@@ -60,6 +60,95 @@ public class PageKeeper {
         }
     }
 
+    public void processRecommendationsForPremium() {
+        if (database.getLoggedUser() != null
+            && database.getLoggedUser().getCredentials().getAccountType().equals(Strings.PREMIUM)) {
+
+            List<Movie> likedMovies = database.getLoggedUser().getLikedMovies();
+            Hashtable<String, Integer> genreLikes = new Hashtable<String, Integer>();
+            for (Movie movie : likedMovies) {
+                for (String genre : movie.getGenres()) {
+                    if (!genreLikes.containsKey(genre)) {
+                        genreLikes.put(genre, 1);
+                    } else {
+                        genreLikes.put(genre, genreLikes.get(genre) + 1);
+                    }
+                }
+            }
+
+            String bestGenre = "";
+            int maxLikes = 0;
+
+            Enumeration<String> e = genreLikes.keys();
+            while (e.hasMoreElements()) {
+                String genre = e.nextElement();
+                if (genreLikes.get(genre) > maxLikes) {
+                    maxLikes = genreLikes.get(genre);
+                    bestGenre = genre;
+                }
+            }
+
+            Notification notification = new Notification();
+            notification.setMovieName("No recommendation");
+            notification.setMessage("Recommendation");
+
+            List<Movie> databaseMovies = new ArrayList<>(database.getMovies());
+            databaseMovies.sort((Comparator.comparingInt(Movie::getNumLikes).reversed()));
+            for (Movie movie : databaseMovies) {
+                if (movie.getGenres().contains(bestGenre)) {
+                    notification.setMovieName(movie.getName());
+                    notification.setMessage("Recommendation");
+                    break;
+                }
+            }
+
+            database.getLoggedUser().getNotifications().add(notification);
+            Printer.printPremiumNotifications(database, outputData, getLoggedUserCredentials());
+        }
+    }
+
+    public void processBackButton() {
+        String backPage;
+
+        if (database.getPageStack().size() > 1) {
+            String currentPage = database.getPageStack().get(database.getPageStack().size() - 1);
+            backPage = database.getPageStack().get(database.getPageStack().size() - 2);
+
+            if (backPage.equals(PageNames.LOGIN) || backPage.equals(PageNames.REGISTER)) {
+                Printer.printDefaultError(outputData);
+                return;
+            }
+
+            switch (currentPage) {
+                case PageNames.LOGIN            -> switchActivityOnLogin();
+                case PageNames.REGISTER         -> switchActivityOnRegister();
+                case PageNames.AUTHENTICATED    -> switchActivityOnAuthenticated();
+                case PageNames.MOVIES           -> switchActivityOnMovies();
+                case PageNames.UPGRADES         -> switchActivityOnUpgrades();
+                case PageNames.SEE_DETAILS      -> switchActivityOnSeeDetails();
+                case PageNames.LOGOUT,
+                        PageNames.UNAUTHENTICATED  -> switchActivityOnUnauthenticated();
+                default                         -> throwInternalError();
+            }
+
+            database.getPageStack().remove(database.getPageStack().size() - 1);
+        } else {
+            backPage = "";
+        }
+
+        switch (backPage) {
+            case PageNames.LOGIN            -> switchActivityOnLogin();
+            case PageNames.REGISTER         -> switchActivityOnRegister();
+            case PageNames.AUTHENTICATED    -> switchActivityOnAuthenticated();
+            case PageNames.MOVIES           -> switchActivityOnMovies(new Action());
+            case PageNames.UPGRADES         -> switchActivityOnUpgrades();
+            case PageNames.SEE_DETAILS      -> switchActivityOnSeeDetails();
+            case PageNames.LOGOUT,
+                PageNames.UNAUTHENTICATED  -> switchActivityOnUnauthenticated();
+            default                         -> Printer.printDefaultError(outputData);
+        }
+    }
+
     public void processDatabaseModification(final Action action) {
         if (action.getFeature().matches(FeatureNames.ADD)) {
             if (database.getMovieByName(action.getAddedMovie().getName()) != null) {
@@ -82,6 +171,13 @@ public class PageKeeper {
 
             database.addMovie(newMovie);
             notifyUsers(newMovie.getGenres(), newMovie.getName(), Strings.ADD);
+        } else { /* delete */
+            Movie movie = database.getMovieByName(action.getDeletedMovie());
+            if (movie == null) {
+                Printer.printDefaultError(outputData);
+            } else {
+                database.getMovies().remove(movie);
+            }
         }
     }
 
@@ -136,6 +232,7 @@ public class PageKeeper {
             }
 
             if (!error) {
+                database.getPageStack().add(action.getPage());
                 return;
             }
         }
@@ -149,6 +246,7 @@ public class PageKeeper {
 
             boolean error = false;
             if (action.getPage().equals(PageNames.REGISTER)) {
+                database.getPageStack().add(action.getPage());
                 switchActivityOnRegister();
             } else {
                 switchActivityOnUnauthenticated(error);
@@ -183,6 +281,7 @@ public class PageKeeper {
 
             boolean error = false;
             if (action.getPage().equals(PageNames.LOGIN)) {
+                database.getPageStack().add(action.getPage());
                 switchActivityOnLogin();
             } else {
                 switchActivityOnUnauthenticated(error);
@@ -220,6 +319,7 @@ public class PageKeeper {
                 default                     -> Printer.printDefaultError(outputData);
             }
 
+            database.getPageStack().add(action.getPage());
             return;
         }
 
@@ -237,6 +337,7 @@ public class PageKeeper {
                 default                     -> Printer.printDefaultError(outputData);
             }
 
+            database.getPageStack().add(action.getPage());
             return;
         }
 
@@ -276,6 +377,7 @@ public class PageKeeper {
                 default                     -> Printer.printDefaultError(outputData);
             }
 
+            database.getPageStack().add(action.getPage());
             return;
         }
 
@@ -313,6 +415,7 @@ public class PageKeeper {
                 default                     -> Printer.printDefaultError(outputData);
             }
 
+            database.getPageStack().add(action.getPage());
             return;
         }
 

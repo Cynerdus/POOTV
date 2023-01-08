@@ -155,6 +155,10 @@ public final class Printer {
             selectedMovies.sort((Comparator.comparingInt(Movie::getRating)));
         }
 
+        if (filters.getSort().getRating().equals(Strings.DECREASING)) {
+            selectedMovies.sort((Comparator.comparingInt(Movie::getRating).reversed()));
+        }
+
         if (filters.getSort().getRating().equals(Strings.DECREASING)
             && filters.getSort().getDuration().equals(Strings.DECREASING)) {
             selectedMovies.sort((Comparator.comparingInt(Movie::getRating).reversed()));
@@ -339,5 +343,22 @@ public final class Printer {
         currentUserNode.set("notifications", notifications);
 
     }
+
+    public static void printPremiumNotifications(final Database database,
+                                                final ArrayNode output,
+                                                final Credentials credentials) {
+
+        ObjectNode      node = OBJECT_MAPPER.createObjectNode(),
+                        currentUserNode = OBJECT_MAPPER.createObjectNode();
+
+        printUserNode(currentUserNode, database.getLoggedUser());
+
+        node.set("error", null);
+        node.set("currentMoviesList", null);
+        node.set("currentUser", currentUserNode);
+
+        output.add(node);
+    }
+
     private Printer() { }
 }
