@@ -13,5 +13,9 @@ public final class FeatureNames {
     public static final String LIKE = "like";
     public static final String RATE = "rate";
 
+    public static final String SUBSCRIBE = "subscribe";
+
+    public static final String ADD = "add";
+
     private FeatureNames() { }
 }

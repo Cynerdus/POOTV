@@ -35,6 +35,7 @@ public class SeeDetails extends Page {
         legalFeatures.add(FeatureNames.LIKE);
         legalFeatures.add(FeatureNames.RATE);
         legalFeatures.add(FeatureNames.FILTER);
+        legalFeatures.add(FeatureNames.SUBSCRIBE);
     }
 
     /**

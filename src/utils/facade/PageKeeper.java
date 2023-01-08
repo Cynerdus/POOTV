@@ -3,12 +3,12 @@ package utils.facade;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import utils.Database;
 import utils.constants.FeatureNames;
-import utils.structures.Action;
+import utils.constants.Strings;
+import utils.structures.*;
 import utils.Printer;
 import utils.constants.PageNames;
-import utils.structures.Credentials;
-import utils.structures.Movie;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PageKeeper {
@@ -57,6 +57,45 @@ public class PageKeeper {
             case PageNames.LOGOUT,
                  PageNames.UNAUTHENTICATED  -> processActionOnUnauthenticatedPage(action);
             default                         -> throwInternalError();
+        }
+    }
+
+    public void processDatabaseModification(final Action action) {
+        if (action.getFeature().matches(FeatureNames.ADD)) {
+            if (database.getMovieByName(action.getAddedMovie().getName()) != null) {
+                Printer.printDefaultErrorWithCredentials(database, outputData);
+            }
+
+            Movie newMovie = new Movie();
+            newMovie.setName(action.getAddedMovie().getName());
+            newMovie.setYear(action.getAddedMovie().getYear());
+            newMovie.setDuration(action.getAddedMovie().getDuration());
+
+            ArrayList<String> genres, actors, countriesBanned;
+            genres = new ArrayList<>(action.getAddedMovie().getGenres());
+            actors = new ArrayList<>(action.getAddedMovie().getActors());
+            countriesBanned = new ArrayList<>(action.getAddedMovie().getCountriesBanned());
+
+            newMovie.setGenres(genres);
+            newMovie.setActors(actors);
+            newMovie.setCountriesBanned(countriesBanned);
+
+            database.addMovie(newMovie);
+            notifyUsers(newMovie.getGenres(), newMovie.getName(), Strings.ADD);
+        }
+    }
+
+    private void notifyUsers(final List<String> genres, final String movieName, final String message) {
+        List<User> userList = database.getUsers();
+        for (User user : userList) {
+            for (String genre : genres) {
+                if (user.getSubscriptions().contains(genre)) {
+                    Notification notification = new Notification();
+                    notification.setMovieName(movieName);
+                    notification.setMessage(message);
+                    user.getNotifications().add(notification);
+                }
+            }
         }
     }
 
@@ -282,6 +321,7 @@ public class PageKeeper {
             case FeatureNames.PURCHASE  -> activatePurchaseFeature(action);
             case FeatureNames.LIKE      -> activateLikeFeature(action);
             case FeatureNames.RATE      -> activateRateFeature(action);
+            case FeatureNames.SUBSCRIBE -> activateSubscribeFeature(action);
             case FeatureNames.FILTER    -> {
                                                 List<Movie> list;
                                                 list = Printer.printMoviesByFilter(database,
@@ -393,6 +433,14 @@ public class PageKeeper {
         }
     }
 
+    public void activateSubscribeFeature(Action action) {
+        if (database.getLoggedUser().getSubscriptions().contains(action.getSubscribedGenre())) {
+            Printer.printDefaultError(outputData);
+        } else {
+            database.getLoggedUser().getSubscriptions().add(action.getSubscribedGenre());
+        }
+    }
+
     private void switchActivityOnLogin() {
         login.activeSwitch();
     }
@@ -403,9 +451,11 @@ public class PageKeeper {
 
     private void switchActivityOnUnauthenticated() {
         unauthenticated.activeSwitch();
+        database.setLoggedUser(null);
     }
     private void switchActivityOnUnauthenticated(boolean error) {
         unauthenticated.activeSwitch();
+        database.setLoggedUser(null);
         error = true;
     }
 

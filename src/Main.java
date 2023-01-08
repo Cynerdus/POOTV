@@ -17,13 +17,15 @@ public final class Main {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
 
-        Input inputData = objectMapper.readValue(new File(args[0]), Input.class);
+        Input inputData = objectMapper.readValue(new File("checker/resources/in/basic_4.json"), Input.class);
+        //Input inputData = objectMapper.readValue(new File(args[0]), Input.class);
         ArrayNode outputData = objectMapper.createArrayNode();
 
         Simulator simulator = new Simulator(inputData, outputData);
         outputData = simulator.generateOutput();
 
-        objectWriter.writeValue(new File(args[1]), outputData);
+        //objectWriter.writeValue(new File(args[1]), outputData);
+        objectWriter.writeValue(new File("out.json"), outputData);
     }
 
     private Main() { }

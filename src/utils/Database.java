@@ -210,4 +210,13 @@ public class Database {
         }
         return null;
     }
+
+    public Movie getMovieByName(final String name) {
+        for (Movie movie : movies) {
+            if (movie.getName().equals(name)) {
+                return movie;
+            }
+        }
+        return null;
+    }
 }

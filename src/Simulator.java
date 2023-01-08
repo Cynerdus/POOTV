@@ -1,5 +1,6 @@
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import utils.Database;
+import utils.constants.Strings;
 import utils.structures.Action;
 import utils.structures.Input;
 import utils.facade.PageKeeper;
@@ -43,7 +44,11 @@ public class Simulator {
         PageKeeper pageKeeper = new PageKeeper(database, outputData);
 
         for (Action action : inputData.getActions()) {
-            pageKeeper.processPageAction(action);
+            if (action.getType().equals(Strings.DATABASE)) {
+                pageKeeper.processDatabaseModification(action);
+            } else {
+                pageKeeper.processPageAction(action);
+            }
         }
     }
 }

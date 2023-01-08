@@ -11,6 +11,9 @@ public class User {
     private List<Movie> purchasedMovies = new ArrayList<>();
     private List<Movie> likedMovies = new ArrayList<>();
     private List<Movie> ratedMovies = new ArrayList<>();
+    private List<Notification> notifications = new ArrayList<>();
+
+    private List<String> subscriptions = new ArrayList<>();
 
     public User() { }
 
@@ -101,5 +104,21 @@ public class User {
      */
     public void addMovieToList(final List<Movie> movieList, final Movie movie) {
         movieList.add(movie);
+    }
+
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
+    }
+
+    public List<String> getSubscriptions() {
+        return subscriptions;
+    }
+
+    public void setSubscriptions(List<String> subscriptions) {
+        this.subscriptions = subscriptions;
     }
 }

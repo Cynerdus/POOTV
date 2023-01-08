@@ -11,6 +11,9 @@ public class Action {
     private String movie;
     private int count;
     private int rate;
+    private String subscribedGenre;
+
+    private Movie addedMovie;
 
     public Action() { }
 
@@ -156,5 +159,21 @@ public class Action {
      */
     public void setRate(final int rate) {
         this.rate = rate;
+    }
+
+    public String getSubscribedGenre() {
+        return subscribedGenre;
+    }
+
+    public void setSubscribedGenre(String subscribedGenre) {
+        this.subscribedGenre = subscribedGenre;
+    }
+
+    public Movie getAddedMovie() {
+        return addedMovie;
+    }
+
+    public void setAddedMovie(Movie addedMovie) {
+        this.addedMovie = addedMovie;
     }
 }

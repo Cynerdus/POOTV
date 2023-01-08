@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import utils.constants.Strings;
-import utils.structures.Credentials;
-import utils.structures.Filters;
-import utils.structures.Movie;
-import utils.structures.User;
+import utils.structures.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -231,6 +228,22 @@ public final class Printer {
 
         output.add(node);
     }
+    public static void printDefaultErrorWithCredentials(final Database database, final ArrayNode output) {
+        ObjectNode      node = OBJECT_MAPPER.createObjectNode();
+        ArrayNode       movieList = OBJECT_MAPPER.createArrayNode();
+
+        node.put("error", "Error");
+        node.set("currentMoviesList", movieList);
+        if (database.getLoggedUser() == null)
+            node.set("currentUser", null);
+        else {
+            ObjectNode currentUserNode = OBJECT_MAPPER.createObjectNode();
+            printUserNode(currentUserNode, database.getLoggedUser());
+            node.set("currentUser", currentUserNode);
+        }
+
+        output.add(node);
+    }
 
     private static void addMovieToArrayNode(final ArrayNode moviesNode, final Movie movie) {
         ObjectNode      movieNode = OBJECT_MAPPER.createObjectNode();
@@ -251,7 +264,7 @@ public final class Printer {
         }
 
         movieNode.put("name", movie.getName())
-                 .put("year", movie.getYear())
+                 .put("year", movie.getYear() + "")
                  .put("duration", movie.getDuration());
 
         movieNode.set("genres", genresNode);
@@ -268,6 +281,15 @@ public final class Printer {
         moviesNode.add(movieNode);
     }
 
+    private static void addNotificationToList(final ArrayNode notifications, final Notification notification) {
+        ObjectNode notificationNode = OBJECT_MAPPER.createObjectNode();
+
+        notificationNode.put("movieName", notification.getMovieName());
+        notificationNode.put("message", notification.getMessage());
+
+        notifications.add(notificationNode);
+    }
+
     private static void printUserNode(final ObjectNode currentUserNode, final User user) {
 
         Credentials credentials = user.getCredentials();
@@ -275,7 +297,8 @@ public final class Printer {
         ArrayNode purchasedMovies = OBJECT_MAPPER.createArrayNode(),
                 watchedMovies = OBJECT_MAPPER.createArrayNode(),
                 likedMovies = OBJECT_MAPPER.createArrayNode(),
-                ratedMovies = OBJECT_MAPPER.createArrayNode();
+                ratedMovies = OBJECT_MAPPER.createArrayNode(),
+                notifications = OBJECT_MAPPER.createArrayNode();
 
         ObjectNode credentialsNode = OBJECT_MAPPER.createObjectNode();
 
@@ -295,6 +318,10 @@ public final class Printer {
             addMovieToArrayNode(ratedMovies, movie);
         }
 
+        for (Notification notification : user.getNotifications()) {
+            addNotificationToList(notifications, notification);
+        }
+
         credentialsNode.put("name", credentials.getName())
                 .put("password", credentials.getPassword())
                 .put("accountType", credentials.getAccountType())
@@ -309,6 +336,7 @@ public final class Printer {
         currentUserNode.set("watchedMovies", watchedMovies);
         currentUserNode.set("likedMovies", likedMovies);
         currentUserNode.set("ratedMovies", ratedMovies);
+        currentUserNode.set("notifications", notifications);
 
     }
     private Printer() { }
