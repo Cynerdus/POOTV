@@ -23,4 +23,12 @@ public class BackButton {
     public int getPageQueueSize() {
         return pageQueue.size();
     }
+
+    public String getLastPage() {
+        if (pageQueue.size() > 1) {
+            return pageQueue.get(pageQueue.size() - 1).getState();
+        }
+
+        return "";
+    }
 }
