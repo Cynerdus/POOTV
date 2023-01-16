@@ -1,9 +1,10 @@
-package utils;
+package utils.builder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import utils.Database;
 import utils.constants.Strings;
 import utils.structures.*;
 
@@ -12,7 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-public final class Printer {
+public final class OLD_PRINTER {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -360,5 +361,5 @@ public final class Printer {
         output.add(node);
     }
 
-    private Printer() { }
+    private OLD_PRINTER() { }
 }

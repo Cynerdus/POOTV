@@ -17,7 +17,7 @@ public final class Main {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
 
-        //Input inputData = objectMapper.readValue(new File("checker/resources/in/basic_1.json"), Input.class);
+        //Input inputData = objectMapper.readValue(new File("checker/resources/in/basic_4.json"), Input.class);
         Input inputData = objectMapper.readValue(new File(args[0]), Input.class);
         ArrayNode outputData = objectMapper.createArrayNode();
 

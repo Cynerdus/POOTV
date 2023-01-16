@@ -2,15 +2,14 @@ package utils.facade;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import utils.Database;
+import utils.builder.Printer;
 import utils.constants.FeatureNames;
 import utils.constants.Strings;
 import utils.memento.BackButton;
 import utils.memento.Originator;
 import utils.structures.*;
-import utils.Printer;
 import utils.constants.PageNames;
 
-import java.security.KeyStore;
 import java.util.*;
 
 public class PageKeeper {
@@ -28,6 +27,8 @@ public class PageKeeper {
 
     private final Originator originator = new Originator();
     private final BackButton backButton = new BackButton();
+
+    private Printer printer = new Printer();
 
     public PageKeeper(final Database database, final ArrayNode outputData) {
         this.database = database;
@@ -108,7 +109,8 @@ public class PageKeeper {
             }
 
             database.getLoggedUser().getNotifications().add(notification);
-            Printer.printPremiumNotifications(database, outputData, getLoggedUserCredentials());
+            //OLDPRINTER.printPremiumNotifications(database, outputData, getLoggedUserCredentials());
+            printer.printPremiumNotifications(database.getLoggedUser(), outputData);
         }
     }
 
@@ -123,7 +125,8 @@ public class PageKeeper {
             backPage = originator.getState();
 
             if (backPage.equals(PageNames.LOGIN) || backPage.equals(PageNames.REGISTER)) {
-                Printer.printDefaultError(outputData);
+                //OLDPRINTER.printDefaultError(outputData);
+                printer.printDefaultError(outputData);
                 return;
             }
 
@@ -151,14 +154,16 @@ public class PageKeeper {
             case PageNames.SEE_DETAILS      -> switchActivityOnSeeDetails();
             case PageNames.LOGOUT,
                 PageNames.UNAUTHENTICATED  -> switchActivityOnUnauthenticated();
-            default                         -> Printer.printDefaultError(outputData);
+            default                         -> //OLDPRINTER.printDefaultError(outputData);
+                                                printer.printDefaultError(outputData);
         }
     }
 
     public void processDatabaseModification(final Action action) {
         if (action.getFeature().matches(FeatureNames.ADD)) {
             if (database.getMovieByName(action.getAddedMovie().getName()) != null) {
-                Printer.printDefaultErrorWithCredentials(database, outputData);
+                //OLDPRINTER.printDefaultErrorWithCredentials(database, outputData);
+                printer.printDefaultErrorWithCredentials(database.getLoggedUser(), outputData);
             }
 
             Movie newMovie = new Movie();
@@ -180,7 +185,8 @@ public class PageKeeper {
         } else { /* delete */
             Movie movie = database.getMovieByName(action.getDeletedMovie());
             if (movie == null) {
-                Printer.printDefaultError(outputData);
+                //OLDPRINTER.printDefaultError(outputData);
+                printer.printDefaultError(outputData);
             } else {
                 database.getMovies().remove(movie);
             }
@@ -243,7 +249,8 @@ public class PageKeeper {
             }
         }
 
-        Printer.printDefaultError(outputData);
+        //OLDPRINTER.printDefaultError(outputData);
+        printer.printDefaultError(outputData);
     }
 
     private void processActionOnLoginPage(final Action action) {
@@ -270,7 +277,8 @@ public class PageKeeper {
             switchActivityOnAuthenticated();
 
             database.setLoggedUser(database.getUserWithCredentials(action.getCredentials()));
-            Printer.printHomePageData(database, outputData, getFullCredentials(action));
+            //OLDPRINTER.printHomePageData(database, outputData, getFullCredentials(action));
+            printer.printHomePageData(database.getLoggedUser(), outputData);
 
             return;
         } else {
@@ -278,7 +286,8 @@ public class PageKeeper {
             switchActivityOnUnauthenticated();
         }
 
-        Printer.printDefaultError(outputData);
+        //OLDPRINTER.printDefaultError(outputData);
+        printer.printDefaultError(outputData);
     }
 
     private void processActionOnRegisterPage(final Action action) {
@@ -305,12 +314,14 @@ public class PageKeeper {
             switchActivityOnAuthenticated();
 
             database.setLoggedUser(database.getUserWithCredentials(action.getCredentials()));
-            Printer.printHomePageData(database, outputData, getFullCredentials(action));
+            //OLDPRINTER.printHomePageData(database, outputData, getFullCredentials(action));
+            printer.printHomePageData(database.getLoggedUser(), outputData);
 
             return;
         }
 
-        Printer.printDefaultError(outputData);
+        //OLDPRINTER.printDefaultError(outputData);
+        printer.printDefaultError(outputData);
     }
 
     private void processActionOnAuthenticatedPage(final Action action) {
@@ -322,14 +333,16 @@ public class PageKeeper {
                 case PageNames.UPGRADES     -> switchActivityOnUpgrades();
                 case PageNames.SEE_DETAILS  -> switchActivityOnSeeDetails(action.getMovie());
                 case PageNames.LOGOUT       -> switchActivityOnUnauthenticated();
-                default                     -> Printer.printDefaultError(outputData);
+                default                     -> //OLDPRINTER.printDefaultError(outputData);
+                                                printer.printDefaultError(outputData);
             }
 
             savePageToQueue(action.getPage());
             return;
         }
 
-        Printer.printDefaultError(outputData);
+        //OLDPRINTER.printDefaultError(outputData);
+        printer.printDefaultError(outputData);
     }
 
     private void processActionOnMoviesPage(final Action action) {
@@ -340,7 +353,8 @@ public class PageKeeper {
                 case PageNames.UPGRADES     -> switchActivityOnUpgrades();
                 case PageNames.SEE_DETAILS  -> switchActivityOnSeeDetails(action.getMovie());
                 case PageNames.LOGOUT       -> switchActivityOnUnauthenticated();
-                default                     -> Printer.printDefaultError(outputData);
+                default                     -> //OLDPRINTER.printDefaultError(outputData);
+                                                printer.printDefaultError(outputData);
             }
 
             savePageToQueue(action.getPage());
@@ -349,26 +363,34 @@ public class PageKeeper {
 
         if (movies.isFeatureLegal(action.getFeature())) {
             switch (action.getFeature()) {
-                case FeatureNames.SEARCH    -> Printer.printMoviesBySearch(
+                case FeatureNames.SEARCH    -> /*OLDPRINTER.printMoviesBySearch(
                                                                     database,
                                                                     outputData,
                                                                     getLoggedUserCredentials(),
-                                                                    action.getStartsWith());
+                                                                    action.getStartsWith());*/
+                                                printer.printMoviesBySearch(database,
+                                                        outputData, action.getStartsWith());
                 case FeatureNames.FILTER    -> {
                                                 List<Movie> list;
-                                                list = Printer.printMoviesByFilter(
+                                                /*list = OLDPRINTER.printMoviesByFilter(
                                                                     database,
                                                                     outputData,
                                                                     getLoggedUserCredentials(),
-                                                                    action.getFilters());
+                                                                    action.getFilters());*/
+                                                list = printer.getFilterMovies(database.getLoggedUser(),
+                                                        database.getMovies(), action.getFilters());
+                                                printer.printMovieByFilter(database,
+                                                        outputData, action.getFilters());
                                                 database.setCurrentlyFilteredMovies(list); }
-                default                     -> Printer.printDefaultError(outputData);
+                default                     -> //OLDPRINTER.printDefaultError(outputData);
+                                                printer.printDefaultError(outputData);
             }
 
             return;
         }
 
-        Printer.printDefaultError(outputData);
+        //OLDPRINTER.printDefaultError(outputData);
+        printer.printDefaultError(outputData);
     }
 
     private void processActionOnUpgradesPage(final Action action) {
@@ -380,7 +402,8 @@ public class PageKeeper {
                 case PageNames.MOVIES       -> switchActivityOnMovies(action);
                 case PageNames.SEE_DETAILS  -> switchActivityOnSeeDetails(action.getMovie());
                 case PageNames.LOGOUT       -> switchActivityOnUnauthenticated();
-                default                     -> Printer.printDefaultError(outputData);
+                default                     -> //OLDPRINTER.printDefaultError(outputData);
+                                                printer.printDefaultError(outputData);
             }
 
             savePageToQueue(action.getPage());
@@ -400,13 +423,15 @@ public class PageKeeper {
             };
 
             if (!rc) {
-                Printer.printDefaultError(outputData);
+                //OLDPRINTER.printDefaultError(outputData);
+                printer.printDefaultError(outputData);
             }
 
             return;
         }
 
-        Printer.printDefaultError(outputData);
+        //OLDPRINTER.printDefaultError(outputData);
+        printer.printDefaultError(outputData);
     }
 
     private void processActionOnSeeDetailsPage(final Action action) {
@@ -418,7 +443,8 @@ public class PageKeeper {
                 case PageNames.UPGRADES     -> switchActivityOnUpgrades();
                 case PageNames.SEE_DETAILS  -> switchActivityOnSeeDetails(action.getMovie());
                 case PageNames.LOGOUT       -> switchActivityOnUnauthenticated();
-                default                     -> Printer.printDefaultError(outputData);
+                default                     -> //OLDPRINTER.printDefaultError(outputData);
+                                                printer.printDefaultError(outputData);
             }
 
             savePageToQueue(action.getPage());
@@ -433,12 +459,17 @@ public class PageKeeper {
             case FeatureNames.SUBSCRIBE -> activateSubscribeFeature(action);
             case FeatureNames.FILTER    -> {
                                                 List<Movie> list;
-                                                list = Printer.printMoviesByFilter(database,
+                                                /*list = OLDPRINTER.printMoviesByFilter(database,
                                                                     outputData,
                                                                     getLoggedUserCredentials(),
-                                                                    action.getFilters());
+                                                                    action.getFilters());*/
+                                            list = printer.getFilterMovies(database.getLoggedUser(),
+                                                    database.getMovies(), action.getFilters());
+                                            printer.printMovieByFilter(database,
+                                                    outputData, action.getFilters());
                                             database.setCurrentlyFilteredMovies(list); }
-            default                     -> Printer.printDefaultError(outputData);
+            default                     -> //OLDPRINTER.printDefaultError(outputData);
+                                            printer.printDefaultError(outputData);
         }
     }
 
@@ -472,9 +503,11 @@ public class PageKeeper {
             seeDetails.addMovieToWatchList(movie, database.getLoggedUser());
 
             Credentials credentials = database.getLoggedUser().getCredentials();
-            Printer.printMovieFromSeeDetails(database, outputData, credentials, movie.getName());
+            //OLDPRINTER.printMovieFromSeeDetails(database, outputData, credentials, movie.getName());
+            printer.printMovieFromSeeDetails(database, outputData, movie.getName());
         } else {
-            Printer.printDefaultError(outputData);
+            //OLDPRINTER.printDefaultError(outputData);
+            printer.printDefaultError(outputData);
         }
     }
 
@@ -488,15 +521,18 @@ public class PageKeeper {
             boolean rc = seeDetails.addMovieToPurchasedList(movie, database.getLoggedUser());
             if (rc) {
                 Credentials credentials = database.getLoggedUser().getCredentials();
-                Printer.printMovieFromSeeDetails(database,
+                /*OLDPRINTER.printMovieFromSeeDetails(database,
                                                 outputData,
                                                 credentials,
-                                                movie.getName());
+                                                movie.getName());*/
+                printer.printMovieFromSeeDetails(database, outputData, movie.getName());
             } else {
-                Printer.printDefaultError(outputData);
+                //OLDPRINTER.printDefaultError(outputData);
+                printer.printDefaultError(outputData);
             }
         } else {
-            Printer.printDefaultError(outputData);
+            //OLDPRINTER.printDefaultError(outputData);
+            printer.printDefaultError(outputData);
         }
     }
 
@@ -510,9 +546,11 @@ public class PageKeeper {
             seeDetails.addMovieToLikedList(movie, database.getLoggedUser());
 
             Credentials credentials = database.getLoggedUser().getCredentials();
-            Printer.printMovieFromSeeDetails(database, outputData, credentials, movie.getName());
+            //OLDPRINTER.printMovieFromSeeDetails(database, outputData, credentials, movie.getName());
+            printer.printMovieFromSeeDetails(database, outputData, movie.getName());
         } else {
-            Printer.printDefaultError(outputData);
+            //OLDPRINTER.printDefaultError(outputData);
+            printer.printDefaultError(outputData);
         }
 
     }
@@ -530,21 +568,25 @@ public class PageKeeper {
                                                         database.getLoggedUser(),
                                                         action.getRate());
             if (rc) {
-                Printer.printMovieFromSeeDetails(database,
+                /*OLDPRINTER.printMovieFromSeeDetails(database,
                                                 outputData,
                                                 credentials,
-                                                movie.getName());
+                                                movie.getName());*/
+                printer.printMovieFromSeeDetails(database, outputData, movie.getName());
             } else {
-                Printer.printDefaultError(outputData);
+                //OLDPRINTER.printDefaultError(outputData);
+                printer.printDefaultError(outputData);
             }
         } else {
-            Printer.printDefaultError(outputData);
+            //OLDPRINTER.printDefaultError(outputData);
+            printer.printDefaultError(outputData);
         }
     }
 
     public void activateSubscribeFeature(Action action) {
         if (database.getLoggedUser().getSubscriptions().contains(action.getSubscribedGenre())) {
-            Printer.printDefaultError(outputData);
+            //OLDPRINTER.printDefaultError(outputData);
+            printer.printDefaultError(outputData);
         } else {
             database.getLoggedUser().getSubscriptions().add(action.getSubscribedGenre());
         }
@@ -574,7 +616,8 @@ public class PageKeeper {
 
     private void switchActivityOnMovies(final Action action) {
         movies.activeSwitch();
-        Printer.printMovieListData(database, outputData, getLoggedUserCredentials());
+        //OLDPRINTER.printMovieListData(database, outputData, getLoggedUserCredentials());
+        printer.printMovieListData(database, outputData);
     }
 
     private void switchActivityOnMovies() {
@@ -592,10 +635,12 @@ public class PageKeeper {
             .contains(database.getLoggedUser().getCredentials().getCountry())) {
 
             Credentials credentials = database.getLoggedUser().getCredentials();
-            Printer.printMovieFromSeeDetails(database, outputData, credentials, movieName);
+            //OLDPRINTER.printMovieFromSeeDetails(database, outputData, credentials, movieName);
+            printer.printMovieFromSeeDetails(database, outputData, movieName);
         } else {
             database.setCurrentMovieOnScreen(null);
-            Printer.printDefaultError(outputData);
+            //OLDPRINTER.printDefaultError(outputData);
+            printer.printDefaultError(outputData);
         }
     }
 
