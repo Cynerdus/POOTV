@@ -10,20 +10,20 @@ import java.util.List;
 
 public interface Builder {
 
-    ObjectNode setError(final ObjectNode node, final String error);
-    ObjectNode setCurrentMoviesList(final ObjectNode node, final ArrayNode list);
-    ObjectNode setCurrentUser(final ObjectNode node, final ObjectNode userNode);
+    ObjectNode setError(ObjectNode node, String error);
+    ObjectNode setCurrentMoviesList(ObjectNode node, ArrayNode list);
+    ObjectNode setCurrentUser(ObjectNode node, ObjectNode userNode);
 
-    ObjectNode setMovieDetails(final ObjectNode movieNode, final Movie movie);
-    ArrayNode setMovieList(final ArrayNode movieList, final List<String> list);
-    ObjectNode putMovieList(final ObjectNode movieNode, final ArrayNode movieList, final String index);
-    ArrayNode putMovieInList(final ArrayNode moviesList, final ObjectNode movieNode);
+    ObjectNode setMovieDetails(ObjectNode movieNode, Movie movie);
+    ArrayNode setMovieList(ArrayNode movieList, List<String> list);
+    ObjectNode putMovieList(ObjectNode movieNode, ArrayNode movieList, String index);
+    ArrayNode putMovieInList(ArrayNode moviesList, ObjectNode movieNode);
 
-    ObjectNode setNotificationDetails(final ObjectNode notificationNode, final Notification notif);
-    ArrayNode putNotificationInList(final ArrayNode notificationList, final ObjectNode notifNode);
+    ObjectNode setNotificationDetails(ObjectNode notificationNode, Notification notif);
+    ArrayNode putNotificationInList(ArrayNode notificationList, ObjectNode notifNode);
 
-    ObjectNode setUserDetails(final ObjectNode userNode, final User user);
-    ArrayNode setUserMovieList(final ArrayNode movieList, final List<Movie> list);
-    ArrayNode setNotificationList(final ArrayNode notificationList, final List<Notification> list);
-    ObjectNode putUserList(final ObjectNode userNode, final ArrayNode listNode, final String index);
+    ObjectNode setUserDetails(ObjectNode userNode, User user);
+    ArrayNode setUserMovieList(ArrayNode movieList, List<Movie> list);
+    ArrayNode setNotificationList(ArrayNode notificationList, List<Notification> list);
+    ObjectNode putUserList(ObjectNode userNode, ArrayNode listNode, String index);
 }

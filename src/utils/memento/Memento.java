@@ -3,15 +3,23 @@ package utils.memento;
 public class Memento {
     private String pageName;
 
-    public Memento(String pageName) {
+    public Memento(final String pageName) {
         this.pageName = pageName;
     }
 
+    /**
+     *
+     * @return      state
+     */
     public String getState() {
         return pageName;
     }
 
-    public void setState(String pageName) {
-        this.pageName = pageName;
+    /**
+     *
+     * @param pageName      state
+     */
+    public void setState(final String pageName1) {
+        pageName = pageName1;
     }
 }

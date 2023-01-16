@@ -108,27 +108,51 @@ public class User {
         movieList.add(movie);
     }
 
+    /**
+     *
+     * @return      notification list
+     */
     public List<Notification> getNotifications() {
         return notifications;
     }
 
-    public void setNotifications(List<Notification> notifications) {
+    /**
+     *
+     * @param notifications     notification queue
+     */
+    public void setNotifications(final List<Notification> notifications) {
         this.notifications = notifications;
     }
 
+    /**
+     *
+     * @return      user subscriptions
+     */
     public List<String> getSubscriptions() {
         return subscriptions;
     }
 
-    public void setSubscriptions(List<String> subscriptions) {
+    /**
+     *
+     * @param subscriptions     user subscriptions
+     */
+    public void setSubscriptions(final List<String> subscriptions) {
         this.subscriptions = subscriptions;
     }
 
+    /**
+     *
+     * @return      registered movies paired with list of rates
+     */
     public List<Integer> getRatedMoviesRates() {
         return ratedMoviesRates;
     }
 
-    public void setRatedMoviesRates(List<Integer> ratedMoviesRates) {
+    /**
+     *
+     * @param ratedMoviesRates      registered rates paired with list of movies
+     */
+    public void setRatedMoviesRates(final List<Integer> ratedMoviesRates) {
         this.ratedMoviesRates = ratedMoviesRates;
     }
 }

@@ -12,7 +12,7 @@ import utils.structures.User;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Database implements Command{
+public class Database implements Command {
 
     private utils.Database database;
     private ArrayNode outputData;
@@ -21,11 +21,20 @@ public class Database implements Command{
 
     private final Printer printer = new Printer();
 
-    public void setData(final ArrayNode outputData, final utils.Database database) {
-        this.outputData = outputData;
-        this.database = database;
+    /**
+     *
+     * @param outputData1       output node for JSON parsing
+     * @param database1         general database
+     */
+    public void setData(final ArrayNode outputData1, final utils.Database database1) {
+        outputData = outputData1;
+        database = database1;
     }
 
+    /**
+     *
+     * @param action        current action
+     */
     public void setAction(final Action action) {
         this.action = action;
     }
@@ -35,6 +44,9 @@ public class Database implements Command{
 
     }
 
+    /**
+     *  command execution
+     */
     @Override
     public void execute() {
         if (action.getFeature().matches(FeatureNames.ADD)) {
@@ -68,7 +80,10 @@ public class Database implements Command{
         }
     }
 
-    private void notifyUsers(final List<String> genres, final String movieName, final String message) {
+    private void notifyUsers(final List<String> genres,
+                             final String movieName,
+                             final String message) {
+
         List<User> userList = database.getUsers();
         for (User user : userList) {
             for (String genre : genres) {

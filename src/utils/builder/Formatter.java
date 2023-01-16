@@ -7,36 +7,61 @@ import utils.structures.Movie;
 import utils.structures.Notification;
 import utils.structures.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Formatter implements Builder {
 
-    private ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     *
+     * @param node      general node
+     * @param error     error to parse
+     * @return          updated node
+     */
     @Override
-    public ObjectNode setError(ObjectNode node, String error) {
+    public ObjectNode setError(final ObjectNode node, final String error) {
         node.put("error", error);
 
         return node;
     }
 
+    /**
+     *
+     * @param node          general node
+     * @param list          movie list node
+     * @return              updated node
+     */
     @Override
-    public ObjectNode setCurrentMoviesList(ObjectNode node, ArrayNode list) {
+    public ObjectNode setCurrentMoviesList(final ObjectNode node,
+                                           final ArrayNode list) {
+
         node.set("currentMoviesList", list);
 
         return node;
     }
 
+    /**
+     *
+     * @param node          general node
+     * @param userNode      user node
+     * @return              updated general node
+     */
     @Override
-    public ObjectNode setCurrentUser(ObjectNode node, ObjectNode userNode) {
+    public ObjectNode setCurrentUser(final ObjectNode node, final ObjectNode userNode) {
         node.set("currentUser", userNode);
 
         return node;
     }
 
+    /**
+     *
+     * @param movieNode     movie node
+     * @param movie         movie to set details
+     * @return              updated movie node
+     */
     @Override
-    public ObjectNode setMovieDetails(ObjectNode movieNode, Movie movie) {
+    public ObjectNode setMovieDetails(final ObjectNode movieNode, final Movie movie) {
         movieNode.put("name", movie.getName())
                 .put("year", movie.getYear() + "")
                 .put("duration", movie.getDuration());
@@ -51,8 +76,14 @@ public class Formatter implements Builder {
         return movieNode;
     }
 
+    /**
+     *
+     * @param movieList     movie list node
+     * @param list          genres / actors / countries banned list
+     * @return              updated list node
+     */
     @Override
-    public ArrayNode setMovieList(ArrayNode movieList, List<String> list) {
+    public ArrayNode setMovieList(final ArrayNode movieList, final List<String> list) {
         for (String item : list) {
             movieList.add(item);
         }
@@ -60,44 +91,82 @@ public class Formatter implements Builder {
         return movieList;
     }
 
+    /**
+     *
+     * @param movieNode     movie node
+     * @param movieList     movie list
+     * @param index         string to name the JSON node
+     * @return              updated node
+     */
     @Override
-    public ObjectNode putMovieList(ObjectNode movieNode, ArrayNode movieList, String index) {
+    public ObjectNode putMovieList(final ObjectNode movieNode,
+                                   final ArrayNode movieList,
+                                   final String index) {
         movieNode.set(index, movieList);
 
         return movieNode;
     }
 
+    /**
+     *
+     * @param moviesList        movie list node
+     * @param movieNode         movie node
+     * @return                  updated list node
+     */
     @Override
-    public ArrayNode putMovieInList(ArrayNode moviesList, ObjectNode movieNode) {
+    public ArrayNode putMovieInList(final ArrayNode moviesList,
+                                    final ObjectNode movieNode) {
         moviesList.add(movieNode);
 
         return moviesList;
     }
 
+    /**
+     *
+     * @param notificationNode      notification node
+     * @param notif                 notification
+     * @return                      updated node
+     */
     @Override
-    public ObjectNode setNotificationDetails(ObjectNode notificationNode, Notification notif) {
+    public ObjectNode setNotificationDetails(final ObjectNode notificationNode,
+                                             final Notification notif) {
         notificationNode.put("movieName", notif.getMovieName());
         notificationNode.put("message", notif.getMessage());
 
         return notificationNode;
     }
 
+    /**
+     *
+     * @param notificationList      notification list node
+     * @param notifNode             notification node
+     * @return                      updated node
+     */
     @Override
-    public ArrayNode putNotificationInList(ArrayNode notificationList, ObjectNode notifNode) {
+    public ArrayNode putNotificationInList(final ArrayNode notificationList,
+                                           final ObjectNode notifNode) {
         notificationList.add(notifNode);
 
         return notificationList;
     }
 
+    /**
+     *
+     * @param userNode      user node
+     * @param user          current user
+     * @return              updated node
+     */
     @Override
-    public ObjectNode setUserDetails(ObjectNode userNode, User user) {
-        ObjectNode credentials = OBJECT_MAPPER.createObjectNode();
+    public ObjectNode setUserDetails(final ObjectNode userNode,
+                                     final User user) {
+
+        ObjectNode credentials = objectMapper.createObjectNode();
 
         credentials.put("name", user.getCredentials().getName())
                 .put("password", user.getCredentials().getPassword())
                 .put("accountType", user.getCredentials().getAccountType())
                 .put("country", user.getCredentials().getCountry())
-                .put("balance", user.getCredentials().getBalance()+ "");
+                .put("balance", user.getCredentials().getBalance() + "");
 
         userNode.set("credentials", credentials);
         userNode.put("tokensCount", user.getCredentials().getTokens());
@@ -106,20 +175,28 @@ public class Formatter implements Builder {
         return userNode;
     }
 
+    /**
+     *
+     * @param movieList         movie list node
+     * @param list              current list
+     * @return                  updated node
+     */
     @Override
-    public ArrayNode setUserMovieList(ArrayNode movieList, List<Movie> list) {
+    public ArrayNode setUserMovieList(final ArrayNode movieList,
+                                      final List<Movie> list) {
+
         for (Movie movie : list) {
-            ObjectNode movieNode = OBJECT_MAPPER.createObjectNode();
+            ObjectNode movieNode = objectMapper.createObjectNode();
             ArrayNode strings;
             setMovieDetails(movieNode, movie);
 
-            strings = setMovieList(OBJECT_MAPPER.createArrayNode(), movie.getGenres());
+            strings = setMovieList(objectMapper.createArrayNode(), movie.getGenres());
             putMovieList(movieNode, strings, "genres");
 
-            strings = setMovieList(OBJECT_MAPPER.createArrayNode(), movie.getActors());
+            strings = setMovieList(objectMapper.createArrayNode(), movie.getActors());
             putMovieList(movieNode, strings, "actors");
 
-            strings = setMovieList(OBJECT_MAPPER.createArrayNode(), movie.getCountriesBanned());
+            strings = setMovieList(objectMapper.createArrayNode(), movie.getCountriesBanned());
             putMovieList(movieNode, strings, "countriesBanned");
 
             movieList.add(movieNode);
@@ -128,17 +205,34 @@ public class Formatter implements Builder {
         return movieList;
     }
 
+    /**
+     *
+     * @param notificationList      node for notification list
+     * @param list                  current list
+     * @return                      updated node list
+     */
     @Override
-    public ArrayNode setNotificationList(ArrayNode notificationList, List<Notification> list) {
+    public ArrayNode setNotificationList(final ArrayNode notificationList,
+                                         final List<Notification> list) {
         for (Notification notif : list) {
-            notificationList.add(setNotificationDetails(OBJECT_MAPPER.createObjectNode(), notif));
+            notificationList.add(setNotificationDetails(objectMapper.createObjectNode(), notif));
         }
 
         return notificationList;
     }
 
+    /**
+     *
+     * @param userNode      user node
+     * @param listNode      general list node
+     * @param index         string to name the JSON node
+     * @return              modified user node
+     */
     @Override
-    public ObjectNode putUserList(ObjectNode userNode, ArrayNode listNode, String index) {
+    public ObjectNode putUserList(final ObjectNode userNode,
+                                  final ArrayNode listNode,
+                                  final String index) {
+
         userNode.set(index, listNode);
 
         return userNode;

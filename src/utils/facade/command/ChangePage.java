@@ -4,11 +4,16 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import utils.Database;
 import utils.builder.Printer;
 import utils.constants.PageNames;
-import utils.facade.*;
-import utils.memento.BackButton;
+import utils.facade.Authenticated;
+import utils.facade.Login;
+import utils.facade.Movies;
+import utils.facade.Register;
+import utils.facade.SeeDetails;
+import utils.facade.Unauthenticated;
+import utils.facade.Upgrades;
 import utils.structures.Movie;
 
-public class ChangePage implements Command{
+public class ChangePage implements Command {
 
     private Database database;
     private ArrayNode outputData;
@@ -31,16 +36,29 @@ public class ChangePage implements Command{
 
     private String movieName = "";
 
-    public void setData(final ArrayNode outputData, final Database database) {
-        this.outputData = outputData;
-        this.database = database;
+    /**
+     *
+     * @param outputData1       output node for JSON parsing
+     * @param database1         general database
+     */
+    public void setData(final ArrayNode outputData1, final Database database1) {
+        outputData = outputData1;
+        database = database1;
     }
 
-    public void setTransition(final String current, final String next) {
-        this.current = current;
-        this.next = next;
+    /**
+     *
+     * @param current1       current page
+     * @param next1          transition page
+     */
+    public void setTransition(final String current1, final String next1) {
+        current = current1;
+        next = next1;
     }
 
+    /**
+     *      command processing
+     */
     @Override
     public void process() {
         eligible = switch (current) {
@@ -62,6 +80,9 @@ public class ChangePage implements Command{
                 ? PageNames.UNAUTHENTICATED : current;
     }
 
+    /**
+     *      command execution
+     */
     @Override
     public void execute() {
         if (!eligible) {
@@ -96,12 +117,20 @@ public class ChangePage implements Command{
         }
     }
 
+    /**
+     *
+     * @return      the new active page
+     */
     public String getActivePage() {
         return active;
     }
 
-    public void setSeeDetailsMovie(final String movieName) {
-        this.movieName = movieName;
+    /**
+     *
+     * @param movieName1        movie name to be searched
+     */
+    public void setSeeDetailsMovie(final String movieName1) {
+        movieName = movieName1;
     }
 
     private Movie getMovieFromDatabase(final String name) {

@@ -25,9 +25,12 @@ is currently active and displayed and so on.
 Among the functionalities of this application, the notable ones are:
 * Filtering and sorting movie lists;
 * Upgrading from a standard account to a premium one;
-* Access restrictions.
+* Access restrictions;
+* Back button;
+* Complex features;
+* Subscriptions & notifications.
 
-## Implementation
+## Implementation - First Stage
 The concept may be simple, but in reality a lot of stuff must be takes into consideration
 when building such a system. This is why the ```Facade``` Design Pattern has been used
 as a base skeleton. ```PageKeeper.java``` is the facade, the 'keeper' of the content, by which
@@ -47,6 +50,16 @@ pages the client can _jump unto_ from the current one. Using ```abstractization`
 method used in the program to keep track of what a client can and cannot do while
 operating on a page. There are other helper functions, which help manage the activity
 of the pages, such as ```isActive``` and ```activeSwitch```.
+
+## Implementation - Second Stage
+Compared to the first stage, 4 design patterns have been used: ```Facade```, ```Memento```,
+```Builder``` and ```Command```. Memento has been used for the back button, as to remember each
+state. A state stores one page name. Having this, a queue of mementos can be formed.
+For the .json parsing functionalities, Builder was the choice. Each object is sequentially
+formed, leaving space to play around with different outputs. For the actual commands,
+I used Command, separating it in 4 branches: 'ChangePage', 'OnPage', 'Back' and Database.
+Facade works as a complex system, containing Command as its underling to operate with.
+Every command is processed and executed separately.
 
 ### Structures
 The structures used in this project are the following:
@@ -74,15 +87,18 @@ from GwentStone[1] and use them here.
 As I have done in GwentStone, I created a ```Printer``` class to play around
 with the output ArrayNode and create proper .json structures.
 
+For the second stage of the project, Printer became more complex in structure.
+
 #### Problems
 The checker was so rudimentary that I questioned myself a lot while writing code.
-At the same time, many instructions given on the ocw[2] were either lacking, or
+At the same time, many instructions given on the ocw[2][3] were either lacking, or
 completely absent, and some instructions were wrong, as they did not match the
 requirements of the reference tests. This be why I followed more the .jsons than
 I have actually read the homework 'story'.
 
 #### References
 [1] - https://github.com/Cynerdus/GwentStone <br>
-[2] - https://ocw.cs.pub.ro/courses/poo-ca-cd/teme/proiect/etapa1
+[2] - https://ocw.cs.pub.ro/courses/poo-ca-cd/teme/proiect/etapa1 <br>
+[3] - https://ocw.cs.pub.ro/courses/poo-ca-cd/teme/proiect/etapa2
 
-##### Copyright 2022 Popescu Cleopatra 323CA
+##### Copyright 2023 Popescu Cleopatra 323CA

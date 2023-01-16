@@ -8,45 +8,36 @@ import utils.facade.command.ChangePage;
 import utils.facade.command.OnPage;
 import utils.memento.BackButton;
 import utils.memento.Originator;
-import utils.structures.*;
 import utils.constants.PageNames;
+import utils.structures.Action;
+import utils.structures.Movie;
+import utils.structures.Notification;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Objects;
 
 public class PageKeeper {
 
     private final Database database;
     private final ArrayNode outputData;
-
-    private final Login login;
-    private final Register register;
-    private final Unauthenticated unauthenticated;
-    private final Movies movies;
-    private final SeeDetails seeDetails;
-    private final Upgrades upgrades;
-    private final Authenticated authenticated;
     private String activePage = "";
 
     private final Originator originator = new Originator();
     private final BackButton backButton = new BackButton();
 
-    private Printer printer = new Printer();
+    private final Printer printer = new Printer();
 
-    private ChangePage changePage = new ChangePage();
-    private OnPage onPage = new OnPage();
-    private utils.facade.command.Database dabatase = new utils.facade.command.Database();
+    private final ChangePage changePage = new ChangePage();
+    private final OnPage onPage = new OnPage();
+    private final utils.facade.command.Database dabatase = new utils.facade.command.Database();
 
     public PageKeeper(final Database database, final ArrayNode outputData) {
         this.database = database;
         this.outputData = outputData;
-
-        login =             new Login();
-        register =          new Register();
-        unauthenticated =   new Unauthenticated();
-        movies =            new Movies();
-        seeDetails =        new SeeDetails();
-        upgrades =          new Upgrades();
-        authenticated =     new Authenticated();
 
         activePage = PageNames.UNAUTHENTICATED;
 
@@ -101,11 +92,18 @@ public class PageKeeper {
         }
     }
 
-    public void savePageToQueue(String page) {
+    /**
+     *
+     * @param page      page to be saved in queue
+     */
+    public void savePageToQueue(final String page) {
         originator.setState(page);
         backButton.addPage(originator.saveToMemento());
     }
 
+    /**
+     *  pops the last page from the page queue and refreshes the active page
+     */
     public void processBackButton() {
         String backPage = "";
         int size = backButton.getPageQueueSize();
@@ -131,6 +129,9 @@ public class PageKeeper {
         activePage = backPage;
     }
 
+    /**
+     *      creates the recommendations list for the premium users
+     */
     public void processRecommendationsForPremium() {
         if (database.getLoggedUser() != null
             && database.getLoggedUser().getCredentials().getAccountType().equals(Strings.PREMIUM)) {

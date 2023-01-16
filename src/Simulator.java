@@ -1,19 +1,11 @@
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import utils.Database;
-import utils.constants.Strings;
 import utils.structures.Action;
 import utils.structures.Input;
 import utils.facade.PageKeeper;
 
 public class Simulator {
-
-    private static final String CHANGE_PAGE = "change page";
-    private static final String ON_PAGE = "on page";
-
-    private static final String LOGIC = "logic";
-    private static final String REGISTER = "register";
     private final Input inputData;
-
     private final ArrayNode outputData;
 
     private Database database;

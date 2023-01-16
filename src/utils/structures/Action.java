@@ -162,27 +162,51 @@ public class Action {
         this.rate = rate;
     }
 
+    /**
+     *
+     * @return      subscribed genres
+     */
     public String getSubscribedGenre() {
         return subscribedGenre;
     }
 
-    public void setSubscribedGenre(String subscribedGenre) {
+    /**
+     *
+     * @param subscribedGenre       subscribed genres
+     */
+    public void setSubscribedGenre(final String subscribedGenre) {
         this.subscribedGenre = subscribedGenre;
     }
 
+    /**
+     *
+     * @return      added movie
+     */
     public Movie getAddedMovie() {
         return addedMovie;
     }
 
-    public void setAddedMovie(Movie addedMovie) {
+    /**
+     *
+     * @param addedMovie        added movie
+     */
+    public void setAddedMovie(final Movie addedMovie) {
         this.addedMovie = addedMovie;
     }
 
+    /**
+     *
+     * @return      deleted movie
+     */
     public String getDeletedMovie() {
         return deletedMovie;
     }
 
-    public void setDeletedMovie(String deletedMovie) {
+    /**
+     *
+     * @param deletedMovie      deleted thing
+     */
+    public void setDeletedMovie(final String deletedMovie) {
         this.deletedMovie = deletedMovie;
     }
 }

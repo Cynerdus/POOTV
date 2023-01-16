@@ -4,8 +4,6 @@ import utils.structures.Credentials;
 import utils.structures.Movie;
 import utils.structures.User;
 
-import java.security.Key;
-import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -213,6 +211,11 @@ public class Database {
         return null;
     }
 
+    /**
+     *
+     * @param name          name to search by
+     * @return              the movie
+     */
     public Movie getMovieByName(final String name) {
         for (Movie movie : movies) {
             if (movie.getName().equals(name)) {

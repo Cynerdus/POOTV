@@ -5,14 +5,19 @@ import utils.Database;
 import utils.builder.Printer;
 import utils.constants.FeatureNames;
 import utils.constants.PageNames;
-import utils.facade.*;
+import utils.facade.Authenticated;
+import utils.facade.Login;
+import utils.facade.Movies;
+import utils.facade.Register;
+import utils.facade.SeeDetails;
+import utils.facade.Unauthenticated;
+import utils.facade.Upgrades;
 import utils.structures.Action;
-import utils.structures.Credentials;
 import utils.structures.Movie;
 
 import java.util.List;
 
-public class OnPage implements Command{
+public class OnPage implements Command {
 
     private Database database;
     private ArrayNode outputData;
@@ -34,20 +39,36 @@ public class OnPage implements Command{
 
     private Boolean eligible = false;
 
-    public void setData(final ArrayNode outputData, final Database database) {
-        this.outputData = outputData;
-        this.database = database;
+    /**
+     *
+     * @param outputData1       outputData node for JSON parsing
+     * @param database1         general database
+     */
+    public void setData(final ArrayNode outputData1, final Database database1) {
+        outputData = outputData1;
+        database = database1;
     }
 
+    /**
+     *
+     * @param page      current active page
+     */
     public void setActivePage(final String page) {
         active = page;
     }
 
+    /**
+     *
+     * @param action        current action
+     */
     public void setAction(final Action action) {
         this.action = action;
         feature = action.getFeature();
     }
 
+    /**
+     *      command processing
+     */
     @Override
     public void process() {
         eligible = switch (active) {
@@ -62,6 +83,9 @@ public class OnPage implements Command{
         };
     }
 
+    /**
+     *      command execution
+     */
     @Override
     public void execute() {
         if (!eligible) {
@@ -225,6 +249,10 @@ public class OnPage implements Command{
         return null;
     }
 
+    /**
+     *
+     * @return      new active page
+     */
     public String getActivePage() {
         return active;
     }
